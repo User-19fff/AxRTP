@@ -54,18 +54,14 @@ public final class TeleportUtils {
             int z = location.getBlockZ();
             int y = location.getBlockY();
 
-            // Check ground block (Y-1)
             Block groundBlock = world.getBlockAt(x, y - 1, z);
             if (isBlockUnsafe(groundBlock, blacklistedBlocks, true)) {
                 return false;
             }
 
-            // Check player's space (Y and Y+1)
             for (int i = 0; i < PLAYER_HEIGHT; i++) {
                 Block currentBlock = world.getBlockAt(x, y + i, z);
-                if (isBlockUnsafe(currentBlock, blacklistedBlocks, false)) {
-                    return false;
-                }
+                if (isBlockUnsafe(currentBlock, blacklistedBlocks, false)) return false;
             }
 
             return true;
