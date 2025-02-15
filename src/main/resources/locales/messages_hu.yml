@@ -1,0 +1,10 @@
+prefix: "&8[&bAxRTP&8] &7>"
+
+messages:
+  reload: "%prefix% &aSikeresen újratöltötted a fájlokat!"
+  no-permission: "%prefix% &cNincsen ehhez jogod!"
+  no-place: "%prefix% &cNem sikerült biztonságos helyet találni!"
+  lockdown: "%prefix% &cMár túl sokszor használtad a teleportálást!"
+  blacklisted-world: "%prefix% &cEbbe a világba nem teleportálhatsz!"
+  cant-move: "%prefix% &cNem mozdulhatsz meg a teleportálás közben!"
+  cooldown: "%prefix% &cMég nem használhatod ezt {time} másodpercig!"

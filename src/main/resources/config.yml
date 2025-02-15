@@ -1,0 +1,47 @@
+language: "hu"
+
+aliases:
+  - "rtp"
+  - "axrtp"
+
+teleport:
+  maximum-attempts: 32
+  teleport-on-first-join:
+    enabled: false
+    world: "world"
+  cooldown:
+    enabled: false
+    time: 30
+    lock-after: 0 # 0 if disabled.
+  delay:
+    enabled: true
+    time: 3
+    sound: "BLOCK_ANVIL_PLACE"
+    cancel-on-move: false
+    title:
+      enabled: true
+      title: "&aTeleportálás"
+      subtitle: "&e{time}"
+
+blacklisted-blocks:
+  - "WATER"
+  - "LAVA"
+  - "CACTUS"
+  - "KELP"
+
+blacklisted-worlds:
+  - "world_nether"
+  - "world_the_end"
+
+title:
+  enabled: true
+  title: "&aElteleportálva!"
+  subtitle: "&eJó kalandozást!"
+sound:
+  enabled: true
+  list:
+    - "UI_BUTTON_CLICK"
+
+world-radius:
+  world: 3000
+  world_nether: 1000
