@@ -1,6 +1,6 @@
-package net.coma112.axRTP.handlers;
+package net.coma112.axrtp.handlers;
 
-import net.coma112.axRTP.identifiers.keys.MessageKeys;
+import net.coma112.axrtp.identifiers.keys.MessageKeys;
 import org.jetbrains.annotations.NotNull;
 import revxrsal.commands.bukkit.actor.BukkitCommandActor;
 import revxrsal.commands.bukkit.exception.BukkitExceptionHandler;

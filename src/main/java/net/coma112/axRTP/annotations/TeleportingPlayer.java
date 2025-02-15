@@ -1,4 +1,4 @@
-package net.coma112.axRTP.annotations;
+package net.coma112.axrtp.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,8 +1,8 @@
-package net.coma112.axRTP.language;
+package net.coma112.axrtp.language;
 
 import lombok.Getter;
-import net.coma112.axRTP.AxRTP;
-import net.coma112.axRTP.handlers.ConfigurationHandler;
+import net.coma112.axrtp.AxRTP;
+import net.coma112.axrtp.handlers.ConfigurationHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;

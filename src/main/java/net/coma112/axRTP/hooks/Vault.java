@@ -1,7 +1,7 @@
-package net.coma112.axRTP.hooks;
+package net.coma112.axrtp.hooks;
 
 import lombok.Getter;
-import net.coma112.axRTP.AxRTP;
+import net.coma112.axrtp.AxRTP;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

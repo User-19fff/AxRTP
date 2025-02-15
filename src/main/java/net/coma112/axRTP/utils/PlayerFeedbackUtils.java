@@ -1,7 +1,7 @@
-package net.coma112.axRTP.utils;
+package net.coma112.axrtp.utils;
 
 import lombok.experimental.UtilityClass;
-import net.coma112.axRTP.identifiers.keys.ConfigKeys;
+import net.coma112.axrtp.identifiers.keys.ConfigKeys;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;

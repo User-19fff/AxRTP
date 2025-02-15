@@ -25,6 +25,7 @@ dependencies {
     zap("io.github.revxrsal:lamp.common:4.0.0-beta.23")
     zap("io.github.revxrsal:lamp.brigadier:4.0.0-beta.23")
     zap("com.github.Anon8281:UniversalScheduler:0.1.6")
+    zap("io.papermc:paperlib:1.0.7")
 
     compileOnly("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")
     compileOnly("org.projectlombok:lombok:1.18.36")
@@ -47,11 +48,12 @@ tasks.compileJava {
 
 zapper {
     libsFolder = "libs"
-    relocationPrefix = "net.solostudio.skillgrind.libraries"
+    relocationPrefix = "net.solostudio.axrtp.libraries"
 
     repositories { includeProjectRepositories() }
 
     relocate("com.github.Anon8281.universalScheduler", "universalScheduler")
+    relocate("io.papermc.lib", "paperlib")
 }
 
 tasks.shadowJar {

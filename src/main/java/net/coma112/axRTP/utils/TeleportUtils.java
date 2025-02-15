@@ -1,19 +1,16 @@
-package net.coma112.axRTP.utils;
+package net.coma112.axrtp.utils;
 
+import io.papermc.lib.PaperLib;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import net.coma112.axRTP.AxRTP;
-import net.coma112.axRTP.identifiers.keys.ConfigKeys;
+import net.coma112.axrtp.AxRTP;
+import net.coma112.axrtp.identifiers.keys.ConfigKeys;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.Random;
-import java.util.Set;
-import java.util.Objects;
-import java.util.HashSet;
-import java.util.Collections;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -24,39 +21,38 @@ public final class TeleportUtils {
     private static final double CENTER_OFFSET = 0.5;
 
     public static @NotNull CompletableFuture<Location> findRandomSafeLocationAsync(@NotNull World world, @NotNull Location center, @NotNull Set<Material> blacklistedBlocks) {
-        return CompletableFuture.supplyAsync(() -> findRandomSafeLocation(world, center, getWorldRadius(world), blacklistedBlocks));
-    }
+        return CompletableFuture.supplyAsync(() -> {
+            Random random = ThreadLocalRandom.current();
+            int radius = getWorldRadius(world);
+            int centerX = center.getBlockX();
+            int centerZ = center.getBlockZ();
 
-    public static @NotNull Location findRandomSafeLocation(@NotNull World world, @NotNull Location center, int radius, @NotNull Set<Material> blacklistedBlocks) {
-        validateParameters(world, center, blacklistedBlocks);
+            for (int i = 0; i < ConfigKeys.TELEPORT_MAXIMUM_ATTEMPTS.getInt(); i++) {
+                int x = centerX + random.nextInt(-radius, radius + 1);
+                int z = centerZ + random.nextInt(-radius, radius + 1);
 
-        final Random random = ThreadLocalRandom.current();
-        final int centerX = center.getBlockX();
-        final int centerZ = center.getBlockZ();
+                CompletableFuture<Location> future = PaperLib.getChunkAtAsync(world, x >> 4, z >> 4).thenApply(chunk -> {
+                    int y = world.getHighestBlockYAt(x, z);
+                    Location candidate = new Location(world, x + CENTER_OFFSET, y + 1, z + CENTER_OFFSET, center.getYaw(), center.getPitch());
 
-        for (int i = 0; i < ConfigKeys.TELEPORT_MAXIMUM_ATTEMPTS.getInt(); i++) {
-            int x = centerX + random.nextInt(-radius, radius + 1);
-            int z = centerZ + random.nextInt(-radius, radius + 1);
-            int y = world.getHighestBlockYAt(x, z);
+                    if (isLocationSafe(candidate, blacklistedBlocks)) return candidate;
+                    return null;
+                });
 
-            Location candidate = new Location(world, x, y, z);
+                try {
+                    Location location = future.get();
+                    if (location != null) return location;
+                } catch (Exception exception) {
+                    LoggerUtils.error(exception.getMessage());
+                }
+            }
 
-            if (isLocationSafe(candidate, blacklistedBlocks)) return finalizeLocation(candidate, center);
-        }
-
-        return world.getSpawnLocation();
+            return world.getSpawnLocation();
+        });
     }
 
     private static int getWorldRadius(@NotNull World world) {
         return AxRTP.getInstance().getConfiguration().getHandler().getInt("world-radius." + world.getName());
-    }
-
-    private static void validateParameters(@NotNull World world, @NotNull Location center, @NotNull Set<Material> blacklistedBlocks) {
-        Objects.requireNonNull(world, "World cannot be null");
-        Objects.requireNonNull(center, "Center location cannot be null");
-        Objects.requireNonNull(blacklistedBlocks, "Blacklisted blocks set cannot be null");
-
-        if (center.getWorld() == null || !center.getWorld().equals(world)) throw new IllegalArgumentException("Center location must be in the specified world");
     }
 
     private static boolean isLocationSafe(@NotNull Location location, @NotNull Set<Material> blacklistedBlocks) {
@@ -77,17 +73,6 @@ public final class TeleportUtils {
         return blacklistedBlocks.contains(material) || (isGround != material.isSolid());
     }
 
-    private static @NotNull Location finalizeLocation(@NotNull Location location, @NotNull Location original) {
-        return new Location(
-                location.getWorld(),
-                location.getX() + CENTER_OFFSET,
-                location.getY() + 1,
-                location.getZ() + CENTER_OFFSET,
-                original.getYaw(),
-                original.getPitch()
-        );
-    }
-
     public static @NotNull @UnmodifiableView Set<Material> parseMaterialSet(@NotNull Iterable<String> materialNames) {
         return Collections.unmodifiableSet(materialNames instanceof Set<String> names ? convertNamesToMaterials(names) : convertIterableToMaterials(materialNames)
         );
@@ -101,7 +86,6 @@ public final class TeleportUtils {
 
     private static Set<Material> convertNamesToMaterials(@NotNull Set<String> names) {
         return names.stream()
-                .parallel()
                 .map(name -> Material.valueOf(name.toUpperCase()))
                 .collect(Collectors.toUnmodifiableSet());
     }

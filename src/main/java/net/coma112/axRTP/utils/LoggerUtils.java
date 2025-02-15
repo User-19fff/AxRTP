@@ -1,4 +1,4 @@
-package net.coma112.axRTP.utils;
+package net.coma112.axrtp.utils;
 
 import lombok.experimental.UtilityClass;
 import org.apache.logging.log4j.LogManager;

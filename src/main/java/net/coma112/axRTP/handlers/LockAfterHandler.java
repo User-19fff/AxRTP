@@ -1,8 +1,8 @@
-package net.coma112.axRTP.handlers;
+package net.coma112.axrtp.handlers;
 
 import lombok.RequiredArgsConstructor;
-import net.coma112.axRTP.data.PlayerRTPState;
-import net.coma112.axRTP.identifiers.keys.MessageKeys;
+import net.coma112.axrtp.data.PlayerRTPState;
+import net.coma112.axrtp.identifiers.keys.MessageKeys;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 

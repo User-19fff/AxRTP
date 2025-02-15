@@ -1,4 +1,4 @@
-package net.coma112.axRTP.data;
+package net.coma112.axrtp.data;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,7 +1,7 @@
-package net.coma112.axRTP.hooks;
+package net.coma112.axrtp.hooks;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import net.coma112.axRTP.AxRTP;
+import net.coma112.axrtp.AxRTP;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 

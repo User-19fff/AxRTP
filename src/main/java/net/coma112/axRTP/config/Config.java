@@ -1,8 +1,8 @@
-package net.coma112.axRTP.config;
+package net.coma112.axrtp.config;
 
 import lombok.Getter;
-import net.coma112.axRTP.AxRTP;
-import net.coma112.axRTP.handlers.ConfigurationHandler;
+import net.coma112.axrtp.AxRTP;
+import net.coma112.axrtp.handlers.ConfigurationHandler;
 
 @Getter
 public class Config {

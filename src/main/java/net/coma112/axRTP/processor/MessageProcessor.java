@@ -1,4 +1,4 @@
-package net.coma112.axRTP.processor;
+package net.coma112.axrtp.processor;
 
 import lombok.experimental.UtilityClass;
 import org.bukkit.ChatColor;

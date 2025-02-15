@@ -1,9 +1,9 @@
-package net.coma112.axRTP.handlers;
+package net.coma112.axrtp.handlers;
 
 import lombok.extern.slf4j.Slf4j;
-import net.coma112.axRTP.AxRTP;
-import net.coma112.axRTP.processor.MessageProcessor;
-import net.coma112.axRTP.utils.LoggerUtils;
+import net.coma112.axrtp.AxRTP;
+import net.coma112.axrtp.processor.MessageProcessor;
+import net.coma112.axrtp.utils.LoggerUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.Contract;

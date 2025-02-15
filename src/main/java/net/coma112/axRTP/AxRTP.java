@@ -1,16 +1,16 @@
-package net.coma112.axRTP;
+package net.coma112.axrtp;
 
 import com.github.Anon8281.universalScheduler.UniversalScheduler;
 import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
 import lombok.Getter;
-import net.coma112.axRTP.config.Config;
-import net.coma112.axRTP.handlers.ConfigurationHandler;
-import net.coma112.axRTP.handlers.LockAfterHandler;
-import net.coma112.axRTP.hooks.PlaceholderAPI;
-import net.coma112.axRTP.identifiers.LanguageTypes;
-import net.coma112.axRTP.identifiers.keys.ConfigKeys;
-import net.coma112.axRTP.language.Language;
-import net.coma112.axRTP.utils.RegisterUtils;
+import net.coma112.axrtp.config.Config;
+import net.coma112.axrtp.handlers.ConfigurationHandler;
+import net.coma112.axrtp.handlers.LockAfterHandler;
+import net.coma112.axrtp.hooks.PlaceholderAPI;
+import net.coma112.axrtp.identifiers.LanguageTypes;
+import net.coma112.axrtp.identifiers.keys.ConfigKeys;
+import net.coma112.axrtp.language.Language;
+import net.coma112.axrtp.utils.RegisterUtils;
 import revxrsal.zapper.ZapperJavaPlugin;
 
 import java.util.Arrays;

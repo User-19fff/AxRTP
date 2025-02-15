@@ -1,8 +1,8 @@
-package net.coma112.axRTP.identifiers.keys;
+package net.coma112.axrtp.identifiers.keys;
 
 import lombok.Getter;
-import net.coma112.axRTP.AxRTP;
-import net.coma112.axRTP.processor.MessageProcessor;
+import net.coma112.axrtp.AxRTP;
+import net.coma112.axrtp.processor.MessageProcessor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

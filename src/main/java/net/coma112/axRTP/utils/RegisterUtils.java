@@ -1,11 +1,11 @@
-package net.coma112.axRTP.utils;
+package net.coma112.axrtp.utils;
 
 import lombok.experimental.UtilityClass;
-import net.coma112.axRTP.AxRTP;
-import net.coma112.axRTP.commands.CommandTeleport;
-import net.coma112.axRTP.handlers.CommandExceptionHandler;
-import net.coma112.axRTP.identifiers.keys.ConfigKeys;
-import net.coma112.axRTP.listeners.DelayListener;
+import net.coma112.axrtp.AxRTP;
+import net.coma112.axrtp.commands.CommandTeleport;
+import net.coma112.axrtp.handlers.CommandExceptionHandler;
+import net.coma112.axrtp.identifiers.keys.ConfigKeys;
+import net.coma112.axrtp.listeners.DelayListener;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import revxrsal.commands.bukkit.BukkitLamp;

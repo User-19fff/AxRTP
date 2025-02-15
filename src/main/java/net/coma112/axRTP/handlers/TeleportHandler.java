@@ -1,11 +1,11 @@
-package net.coma112.axRTP.handlers;
+package net.coma112.axrtp.handlers;
 
 import com.github.Anon8281.universalScheduler.scheduling.tasks.MyScheduledTask;
-import net.coma112.axRTP.AxRTP;
-import net.coma112.axRTP.identifiers.keys.ConfigKeys;
-import net.coma112.axRTP.identifiers.keys.MessageKeys;
-import net.coma112.axRTP.utils.PlayerFeedbackUtils;
-import net.coma112.axRTP.utils.TeleportUtils;
+import net.coma112.axrtp.AxRTP;
+import net.coma112.axrtp.identifiers.keys.ConfigKeys;
+import net.coma112.axrtp.identifiers.keys.MessageKeys;
+import net.coma112.axrtp.utils.PlayerFeedbackUtils;
+import net.coma112.axrtp.utils.TeleportUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;

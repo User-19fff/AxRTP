@@ -1,4 +1,4 @@
-package net.coma112.axRTP.identifiers;
+package net.coma112.axrtp.identifiers;
 
 public enum LanguageTypes {
     EN,

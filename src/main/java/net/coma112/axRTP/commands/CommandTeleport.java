@@ -1,8 +1,8 @@
-package net.coma112.axRTP.commands;
+package net.coma112.axrtp.commands;
 
-import net.coma112.axRTP.AxRTP;
-import net.coma112.axRTP.handlers.TeleportHandler;
-import net.coma112.axRTP.identifiers.keys.MessageKeys;
+import net.coma112.axrtp.AxRTP;
+import net.coma112.axrtp.handlers.TeleportHandler;
+import net.coma112.axrtp.identifiers.keys.MessageKeys;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
