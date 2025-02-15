@@ -48,7 +48,7 @@ tasks.compileJava {
 
 zapper {
     libsFolder = "libs"
-    relocationPrefix = "net.solostudio.axrtp.libraries"
+    relocationPrefix = "net.coma112.axrtp.libraries"
 
     repositories { includeProjectRepositories() }
 

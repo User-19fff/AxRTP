@@ -13,7 +13,6 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TeleportUtils {
@@ -21,51 +20,60 @@ public final class TeleportUtils {
     private static final double CENTER_OFFSET = 0.5;
 
     public static @NotNull CompletableFuture<Location> findRandomSafeLocationAsync(@NotNull World world, @NotNull Location center, @NotNull Set<Material> blacklistedBlocks) {
+        return findRandomSafeLocationAsync(world, center, blacklistedBlocks, 0);
+    }
+
+    private static @NotNull CompletableFuture<Location> findRandomSafeLocationAsync(@NotNull World world, @NotNull Location center, @NotNull Set<Material> blacklistedBlocks, int attempt) {
+        if (attempt >= ConfigKeys.TELEPORT_MAXIMUM_ATTEMPTS.getInt()) {
+            return CompletableFuture.completedFuture(world.getSpawnLocation());
+        }
+
+        Random random = ThreadLocalRandom.current();
+        int radius = getWorldRadius(world);
+        int centerX = center.getBlockX();
+        int centerZ = center.getBlockZ();
+
+        int x = centerX + random.nextInt(-radius, radius + 1);
+        int z = centerZ + random.nextInt(-radius, radius + 1);
+
+        return PaperLib.getChunkAtAsync(world, x >> 4, z >> 4, true).thenCompose(chunk -> {
+            int highestY = chunk.getChunkSnapshot(true, false, false).getHighestBlockYAt(x & 15, z & 15);
+            Location candidate = new Location(world, x + CENTER_OFFSET, highestY + 1, z + CENTER_OFFSET, center.getYaw(), center.getPitch());
+
+            return isLocationSafeAsync(candidate, blacklistedBlocks).thenCompose(safe -> {
+                if (safe) return CompletableFuture.completedFuture(candidate);
+                else return findRandomSafeLocationAsync(world, center, blacklistedBlocks, attempt + 1);
+            });
+        });
+    }
+
+    private static CompletableFuture<Boolean> isLocationSafeAsync(Location location, Set<Material> blacklistedBlocks) {
         return CompletableFuture.supplyAsync(() -> {
-            Random random = ThreadLocalRandom.current();
-            int radius = getWorldRadius(world);
-            int centerX = center.getBlockX();
-            int centerZ = center.getBlockZ();
+            World world = location.getWorld();
+            int x = location.getBlockX();
+            int z = location.getBlockZ();
+            int y = location.getBlockY();
 
-            for (int i = 0; i < ConfigKeys.TELEPORT_MAXIMUM_ATTEMPTS.getInt(); i++) {
-                int x = centerX + random.nextInt(-radius, radius + 1);
-                int z = centerZ + random.nextInt(-radius, radius + 1);
+            // Check ground block (Y-1)
+            Block groundBlock = world.getBlockAt(x, y - 1, z);
+            if (isBlockUnsafe(groundBlock, blacklistedBlocks, true)) {
+                return false;
+            }
 
-                CompletableFuture<Location> future = PaperLib.getChunkAtAsync(world, x >> 4, z >> 4).thenApply(chunk -> {
-                    int y = world.getHighestBlockYAt(x, z);
-                    Location candidate = new Location(world, x + CENTER_OFFSET, y + 1, z + CENTER_OFFSET, center.getYaw(), center.getPitch());
-
-                    if (isLocationSafe(candidate, blacklistedBlocks)) return candidate;
-                    return null;
-                });
-
-                try {
-                    Location location = future.get();
-                    if (location != null) return location;
-                } catch (Exception exception) {
-                    LoggerUtils.error(exception.getMessage());
+            // Check player's space (Y and Y+1)
+            for (int i = 0; i < PLAYER_HEIGHT; i++) {
+                Block currentBlock = world.getBlockAt(x, y + i, z);
+                if (isBlockUnsafe(currentBlock, blacklistedBlocks, false)) {
+                    return false;
                 }
             }
 
-            return world.getSpawnLocation();
+            return true;
         });
     }
 
     private static int getWorldRadius(@NotNull World world) {
         return AxRTP.getInstance().getConfiguration().getHandler().getInt("world-radius." + world.getName());
-    }
-
-    private static boolean isLocationSafe(@NotNull Location location, @NotNull Set<Material> blacklistedBlocks) {
-        World world = location.getWorld();
-        int x = location.getBlockX();
-        int baseY = location.getBlockY();
-
-        for (int i = 0; i <= PLAYER_HEIGHT; i++) {
-            Block currentBlock = world.getBlockAt(x, baseY + i, location.getBlockZ());
-            if (isBlockUnsafe(currentBlock, blacklistedBlocks, i == 0)) return false;
-        }
-
-        return true;
     }
 
     private static boolean isBlockUnsafe(@NotNull Block block, @NotNull Set<Material> blacklistedBlocks, boolean isGround) {
@@ -74,19 +82,14 @@ public final class TeleportUtils {
     }
 
     public static @NotNull @UnmodifiableView Set<Material> parseMaterialSet(@NotNull Iterable<String> materialNames) {
-        return Collections.unmodifiableSet(materialNames instanceof Set<String> names ? convertNamesToMaterials(names) : convertIterableToMaterials(materialNames)
-        );
-    }
-
-    private static @NotNull @UnmodifiableView Set<Material> convertIterableToMaterials(@NotNull Iterable<String> materialNames) {
         Set<Material> materials = new HashSet<>();
-        materialNames.forEach(name -> materials.add(Material.valueOf(name.toUpperCase())));
+        for (String name : materialNames) {
+            try {
+                materials.add(Material.valueOf(name.toUpperCase()));
+            } catch (IllegalArgumentException ignored) {
+                // Ignore invalid materials
+            }
+        }
         return Collections.unmodifiableSet(materials);
-    }
-
-    private static Set<Material> convertNamesToMaterials(@NotNull Set<String> names) {
-        return names.stream()
-                .map(name -> Material.valueOf(name.toUpperCase()))
-                .collect(Collectors.toUnmodifiableSet());
     }
 }
