@@ -11,7 +11,6 @@ import net.coma112.axRTP.identifiers.LanguageTypes;
 import net.coma112.axRTP.identifiers.keys.ConfigKeys;
 import net.coma112.axRTP.language.Language;
 import net.coma112.axRTP.utils.RegisterUtils;
-import org.bukkit.plugin.java.JavaPlugin;
 import revxrsal.zapper.ZapperJavaPlugin;
 
 import java.util.Arrays;
@@ -49,11 +48,7 @@ public final class AxRTP extends ZapperJavaPlugin {
     private void initializeComponents() {
         config = new Config();
 
-        Arrays.stream(LanguageTypes.values())
-                .forEach(type -> {
-                    ConfigurationHandler.saveResourceIfNotExists("locales/messages_" + type.name().toLowerCase() + ".yml");
-                });
-
+        Arrays.stream(LanguageTypes.values()).forEach(type -> ConfigurationHandler.saveResourceIfNotExists("locales/messages_" + type.name().toLowerCase() + ".yml"));
         ConfigurationHandler.saveResourceIfNotExists("config.yml");
 
         language = new Language("messages_" + LanguageTypes.valueOf(ConfigKeys.LANGUAGE.getString().toUpperCase()).name().toLowerCase());
