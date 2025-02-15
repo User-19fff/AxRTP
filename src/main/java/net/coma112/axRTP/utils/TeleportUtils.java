@@ -56,9 +56,7 @@ public final class TeleportUtils {
         Objects.requireNonNull(center, "Center location cannot be null");
         Objects.requireNonNull(blacklistedBlocks, "Blacklisted blocks set cannot be null");
 
-        if (center.getWorld() == null || !center.getWorld().equals(world)) {
-            throw new IllegalArgumentException("Center location must be in the specified world");
-        }
+        if (center.getWorld() == null || !center.getWorld().equals(world)) throw new IllegalArgumentException("Center location must be in the specified world");
     }
 
     private static boolean isLocationSafe(@NotNull Location location, @NotNull Set<Material> blacklistedBlocks) {
@@ -97,28 +95,14 @@ public final class TeleportUtils {
 
     private static @NotNull @UnmodifiableView Set<Material> convertIterableToMaterials(@NotNull Iterable<String> materialNames) {
         Set<Material> materials = new HashSet<>();
-        materialNames.forEach(name -> {
-            try {
-                materials.add(Material.valueOf(name.toUpperCase()));
-            } catch (IllegalArgumentException exception) {
-                LoggerUtils.warn("Invalid material name in configuration: {}", name);
-            }
-        });
+        materialNames.forEach(name -> materials.add(Material.valueOf(name.toUpperCase())));
         return Collections.unmodifiableSet(materials);
     }
 
     private static Set<Material> convertNamesToMaterials(@NotNull Set<String> names) {
         return names.stream()
                 .parallel()
-                .map(name -> {
-                    try {
-                        return Material.valueOf(name.toUpperCase());
-                    } catch (IllegalArgumentException exception) {
-                        LoggerUtils.warn("Invalid material name in configuration: {}", name);
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
+                .map(name -> Material.valueOf(name.toUpperCase()))
                 .collect(Collectors.toUnmodifiableSet());
     }
 }
