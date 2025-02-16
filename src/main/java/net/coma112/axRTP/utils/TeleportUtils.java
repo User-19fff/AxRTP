@@ -5,13 +5,19 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.coma112.axrtp.AxRTP;
 import net.coma112.axrtp.identifiers.keys.ConfigKeys;
-import org.bukkit.*;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.*;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -39,29 +45,23 @@ public final class TeleportUtils {
             int highestY = chunk.getWorld().getHighestBlockYAt(x, z);
             Location candidate = new Location(world, x + CENTER_OFFSET, highestY + 1, z + CENTER_OFFSET, center.getYaw(), center.getPitch());
 
-            return isLocationSafeAsync(chunk, x, highestY + 1, z, blacklistedBlocks).thenCompose(safe -> {
-                if (safe) return CompletableFuture.completedFuture(candidate);
-                else return findRandomSafeLocationAsync(world, center, blacklistedBlocks, attempt + 1);
-            });
+            if (isLocationSafe(chunk, x, highestY + 1, z, blacklistedBlocks)) return CompletableFuture.completedFuture(candidate);
+            else return findRandomSafeLocationAsync(world, center, blacklistedBlocks, attempt + 1);
         });
+
     }
 
-    private static @NotNull CompletableFuture<Boolean> isLocationSafeAsync(@NotNull Chunk chunk, int x, int y, int z, @NotNull Set<Material> blacklistedBlocks) {
-        return CompletableFuture.supplyAsync(() -> {
-            Block groundBlock = chunk.getBlock(x & 15, y - 1, z & 15);
-            if (isBlockUnsafe(groundBlock, blacklistedBlocks, true)) return false;
+    private static boolean isLocationSafe(@NotNull Chunk chunk, int x, int y, int z, @NotNull Set<Material> blacklistedBlocks) {
+        Block groundBlock = chunk.getBlock(x & 15, y - 1, z & 15);
+        if (isBlockUnsafe(groundBlock, blacklistedBlocks, true)) return false;
 
-            for (int i = 0; i < PLAYER_HEIGHT; i++) {
-                Block currentBlock = chunk.getBlock(x & 15, y + i, z & 15);
-                if (isBlockUnsafe(currentBlock, blacklistedBlocks, false)) return false;
-            }
+        for (int i = 0; i < PLAYER_HEIGHT; i++) {
+            Block currentBlock = chunk.getBlock(x & 15, y + i, z & 15);
+            if (isBlockUnsafe(currentBlock, blacklistedBlocks, false)) return false;
+        }
 
-            return true;
-        });
+        return true;
     }
-
-
-
 
 
     private static int getWorldRadius(@NotNull World world) {
