@@ -5,7 +5,8 @@ import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskSchedule
 import lombok.Getter;
 import net.coma112.axrtp.config.Config;
 import net.coma112.axrtp.handlers.ConfigurationHandler;
-import net.coma112.axrtp.handlers.LockAfterHandler;
+import net.coma112.axrtp.handlers.CooldownHandler;
+import net.coma112.axrtp.handlers.LockdownHandler;
 import net.coma112.axrtp.hooks.PlaceholderAPI;
 import net.coma112.axrtp.identifiers.LanguageTypes;
 import net.coma112.axrtp.identifiers.keys.ConfigKeys;
@@ -20,7 +21,8 @@ public final class AxRTP extends ZapperJavaPlugin {
     @Getter private static AxRTP instance;
     @Getter private TaskScheduler scheduler;
     @Getter private Language language;
-    @Getter private LockAfterHandler lockAfterHandler;
+    @Getter private LockdownHandler lockdownHandler;
+    @Getter private CooldownHandler cooldownHandler;
     private Config config;
 
     @Override
@@ -38,7 +40,8 @@ public final class AxRTP extends ZapperJavaPlugin {
         RegisterUtils.registerListeners();
         PlaceholderAPI.registerHook();
 
-        lockAfterHandler = new LockAfterHandler(new HashMap<>(), ConfigKeys.TELEPORT_COOLDOWN_LOCK_AFTER.getInt());
+        lockdownHandler = new LockdownHandler(new HashMap<>(), ConfigKeys.TELEPORT_COOLDOWN_LOCK_AFTER.getInt());
+        cooldownHandler = new CooldownHandler();
     }
 
     public Config getConfiguration() {

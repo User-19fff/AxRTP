@@ -72,3 +72,12 @@ world-radius:
   # World-specific radius settings.
   world: 100 # Radius for the "world" world.
   world_nether: 1000 # Radius for the "world_nether" world.
+
+commands-on-rtp:
+  # Commands to run when the player's RTPd.
+  enabled: true
+  list:
+    - "msg %player% you have just RTPd nice job ig!" # It automatically replaces %player% with the name of the player.
+
+blacklisted-biomes: # {biome}:{world's name}
+  - "FOREST:world" # In this concept you won't be able to teleport in a forest biome in world.

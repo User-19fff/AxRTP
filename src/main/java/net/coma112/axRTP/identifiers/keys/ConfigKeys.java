@@ -2,6 +2,7 @@ package net.coma112.axrtp.identifiers.keys;
 
 import lombok.Getter;
 import net.coma112.axrtp.AxRTP;
+import net.coma112.axrtp.config.Config;
 import net.coma112.axrtp.processor.MessageProcessor;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,27 +46,31 @@ public enum ConfigKeys {
     EFFECTS_ENABLED("effects.enabled"),
     EFFECTS_LIST("effects.list"),
 
+    COMMAND_ON_RTP_ENABLED("commands-on-rtp.enabled"),
+    COMMAND_ON_RTP_LIST("commands-on-rtp.enabled"),
+
     WORLDS("world-radius");
 
     private final String path;
+    private final Config config = AxRTP.getInstance().getConfiguration();
 
-    ConfigKeys(@NotNull final String path) {
+    ConfigKeys(@NotNull String path) {
         this.path = path;
     }
 
     public @NotNull String getString() {
-        return MessageProcessor.process(AxRTP.getInstance().getConfiguration().getHandler().getString(path));
+        return MessageProcessor.process(config.getHandler().getString(path));
     }
 
     public boolean getBoolean() {
-        return AxRTP.getInstance().getConfiguration().getHandler().getBoolean(path);
+        return config.getHandler().getBoolean(path);
     }
 
     public int getInt() {
-        return AxRTP.getInstance().getConfiguration().getHandler().getInt(path);
+        return config.getHandler().getInt(path);
     }
 
     public List<String> getList() {
-        return AxRTP.getInstance().getConfiguration().getHandler().getList(path);
+        return config.getHandler().getList(path);
     }
 }

@@ -21,13 +21,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class TeleportHandler {
     private static final ConcurrentHashMap<Player, Boolean> TELEPORTING_PLAYERS = new ConcurrentHashMap<>();
-    private static MyScheduledTask TELEPORT_TASK;
+    private static final CooldownHandler COOLDOWN_HANDLER = AxRTP.getInstance().getCooldownHandler();
+    private static MyScheduledTask teleportTask;
 
     public static void rtp(@NotNull Player player, @NotNull World world) {
-        if (!AxRTP.getInstance().getLockAfterHandler().canUseRTP(player)) return;
+        if (!AxRTP.getInstance().getLockdownHandler().canUseRTP(player)) return;
 
-        if (ConfigKeys.TELEPORT_COOLDOWN_ENABLED.getBoolean() && CooldownHandler.isOnCooldown(player)) {
-            long remainingCooldown = CooldownHandler.getRemainingCooldown(player, TimeUnit.SECONDS);
+        if (ConfigKeys.TELEPORT_COOLDOWN_ENABLED.getBoolean() && COOLDOWN_HANDLER.isOnCooldown(player)) {
+            long remainingCooldown = COOLDOWN_HANDLER.getRemainingCooldown(player, TimeUnit.SECONDS);
             player.sendMessage(MessageKeys.COOLDOWN.getMessage().replace("{time}", String.valueOf(remainingCooldown)));
             return;
         }
@@ -38,7 +39,7 @@ public class TeleportHandler {
 
         if (ConfigKeys.TELEPORT_DELAY_CANCEL_ON_MOVE.getBoolean()) TELEPORTING_PLAYERS.put(player, true);
 
-        TELEPORT_TASK = AxRTP.getInstance().getScheduler().runTaskTimer(() -> {
+        teleportTask = AxRTP.getInstance().getScheduler().runTaskTimer(() -> {
             if (timeLeft[0] > 0) {
                 PlayerFeedbackUtils.sendTitle(player,
                         ConfigKeys.TELEPORT_DELAY_ENABLED.getBoolean(),
@@ -59,14 +60,15 @@ public class TeleportHandler {
                                 PlayerFeedbackUtils.playSounds(player);
                                 PlayerFeedbackUtils.showParticles(player);
                                 PlayerFeedbackUtils.applyEffects(player);
+                                PlayerFeedbackUtils.runCommands(player);
 
-                                if (ConfigKeys.TELEPORT_COOLDOWN_ENABLED.getBoolean()) CooldownHandler.setCooldown(player, ConfigKeys.TELEPORT_COOLDOWN_TIME.getInt(), TimeUnit.SECONDS);
+                                if (ConfigKeys.TELEPORT_COOLDOWN_ENABLED.getBoolean()) COOLDOWN_HANDLER.setCooldown(player, ConfigKeys.TELEPORT_COOLDOWN_TIME.getInt(), TimeUnit.SECONDS);
                             } else player.sendMessage(MessageKeys.NO_PLACE.getMessage());
                         });
                     } else player.sendMessage(MessageKeys.NO_PLACE.getMessage());
                 });
 
-                TELEPORT_TASK.cancel();
+                teleportTask.cancel();
                 TELEPORTING_PLAYERS.remove(player);
             }
         }, 0, 20);
@@ -79,50 +81,7 @@ public class TeleportHandler {
     public static void cancelTeleport(@NotNull Player player) {
         if (TELEPORTING_PLAYERS.remove(player) != null) {
             player.sendMessage(MessageKeys.CANT_MOVE.getMessage());
-            TELEPORT_TASK.cancel();
+            teleportTask.cancel();
         }
-    }
-
-    public static void stressTest(@NotNull Player player, @NotNull World world) {
-        int numberOfTeleports = 200;
-        AtomicInteger completedTeleports = new AtomicInteger(0);
-
-        player.sendMessage("§aStress teszt indítva: " + numberOfTeleports + " teleportálás egyszerre...");
-
-        Set<Material> blacklist = TeleportUtils.parseMaterialSet(ConfigKeys.BLACKLISTED_BLOCKS.getList());
-
-        Runnable startTeleport = new Runnable() {
-            @Override
-            public void run() {
-                if (completedTeleports.get() >= numberOfTeleports) {
-                    player.sendMessage("§aStress teszt sikeresen befejeződött: " + completedTeleports.get() + " teleportálás.");
-                    return;
-                }
-
-                CompletableFuture<Location> safeLocationFuture = TeleportUtils.findRandomSafeLocationAsync(world, world.getSpawnLocation(), blacklist);
-
-                safeLocationFuture.thenAccept(safeLocation -> {
-                    if (safeLocation != null) {
-                        PaperLib.teleportAsync(player, safeLocation).thenAccept(success -> {
-                            if (success) {
-                                completedTeleports.incrementAndGet();
-                                player.sendMessage("§eTeleportálva: " + completedTeleports.get() + "/" + numberOfTeleports);
-                            } else {
-                                player.sendMessage("§cNem sikerült teleportálni.");
-                            }
-                        });
-
-                        AxRTP.getInstance().getScheduler().runTaskLater(this, 1);
-                    } else {
-                        player.sendMessage("§cNem találtam biztonságos helyet egyik próbálkozás során sem.");
-                    }
-                }).exceptionally(ex -> {
-                    player.sendMessage("§cHiba történt a teleportálás során: " + ex.getMessage());
-                    return null;
-                });
-            }
-        };
-
-        AxRTP.getInstance().getScheduler().runTask(startTeleport);
     }
 }

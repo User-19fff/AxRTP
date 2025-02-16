@@ -11,8 +11,12 @@ import java.util.List;
 public enum MessageKeys {
     RELOAD("messages.reload"),
 
+    SUCCESS_RESET_LOCKDOWN("messages.success-reset-lockdown"),
+    SUCCESS_RESET_COOLDOWN("messages.success-reset-cooldown"),
+
     NO_PERMISSION("messages.no-permission"),
     NO_PLACE("messages.no-place"),
+    NOT_ON_COOLDOWN("messages.not-on-cooldown"),
 
     LOCKDOWN("messages.lockdown"),
     COOLDOWN("messages.cooldown"),

@@ -2,6 +2,7 @@ package net.coma112.axrtp.utils;
 
 import lombok.experimental.UtilityClass;
 import net.coma112.axrtp.identifiers.keys.ConfigKeys;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -97,6 +98,18 @@ public class PlayerFeedbackUtils {
                     if (effectType != null) player.addPotionEffect(new PotionEffect(effectType, duration, amplifier));
                 } catch (IllegalArgumentException ignored) {}
             }
+        }
+    }
+
+    public void runCommands(@NotNull Player player) {
+        if (!ConfigKeys.COMMAND_ON_RTP_ENABLED.getBoolean()) return;
+
+        List<String> commands = ConfigKeys.EFFECTS_LIST.getList();
+
+        for (String command : commands) {
+            String replacedCommand = command.replace("%player%", player.getName());
+
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), replacedCommand);
         }
     }
 }

@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class LockAfterHandler {
+public class LockdownHandler {
     private final Map<String, PlayerRTPState> playerStateMap;
     private final int lockAfterLimit;
 

@@ -1,7 +1,9 @@
 package net.coma112.axrtp.commands;
 
 import net.coma112.axrtp.AxRTP;
+import net.coma112.axrtp.handlers.CooldownHandler;
 import net.coma112.axrtp.handlers.TeleportHandler;
+import net.coma112.axrtp.identifiers.keys.ConfigKeys;
 import net.coma112.axrtp.identifiers.keys.MessageKeys;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -23,12 +25,30 @@ public class CommandTeleport implements OrphanCommand {
     @Subcommand("rtp")
     @CommandPermission("axrtp.rtp")
     public void rtp(@NotNull Player player, @NotNull World world) {
+        if (!player.hasPermission("axrtp." + world.getName() + ".world")) {
+            player.sendMessage(MessageKeys.NO_PERMISSION.getMessage());
+            return;
+        }
+
         TeleportHandler.rtp(player, world);
     }
 
-    @Subcommand("stresstest")
-    @CommandPermission("axrtp.stresstest")
-    public void stressTest(@NotNull Player player, @NotNull World world) {
-        TeleportHandler.stressTest(player, world);
+    @Subcommand("reset lockdown")
+    @CommandPermission("axrtp.reset.lockdown")
+    public void resetLockdown(@NotNull CommandSender sender, @NotNull Player target) {
+        AxRTP.getInstance().getLockdownHandler().resetPlayerUsage(target);
+        sender.sendMessage(MessageKeys.SUCCESS_RESET_LOCKDOWN.getMessage());
+    }
+
+    @Subcommand("reset cooldown")
+    @CommandPermission("axrtp.reset.cooldown")
+    public void resetCooldown(@NotNull CommandSender sender, @NotNull Player target) {
+        if (!AxRTP.getInstance().getCooldownHandler().isOnCooldown(target)) {
+            sender.sendMessage(MessageKeys.NOT_ON_COOLDOWN.getMessage());
+            return;
+        }
+
+        AxRTP.getInstance().getCooldownHandler().removeCooldown(target);
+        sender.sendMessage(MessageKeys.SUCCESS_RESET_COOLDOWN.getMessage());
     }
 }
