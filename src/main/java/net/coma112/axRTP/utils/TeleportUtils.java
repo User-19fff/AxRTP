@@ -7,6 +7,7 @@ import net.coma112.axrtp.AxRTP;
 import net.coma112.axrtp.identifiers.keys.ConfigKeys;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
@@ -24,9 +25,7 @@ public final class TeleportUtils {
     }
 
     private static @NotNull CompletableFuture<Location> findRandomSafeLocationAsync(@NotNull World world, @NotNull Location center, @NotNull Set<Material> blacklistedBlocks, int attempt) {
-        if (attempt >= ConfigKeys.TELEPORT_MAXIMUM_ATTEMPTS.getInt()) {
-            return CompletableFuture.completedFuture(world.getSpawnLocation());
-        }
+        if (attempt >= ConfigKeys.TELEPORT_MAXIMUM_ATTEMPTS.getInt()) return CompletableFuture.completedFuture(world.getSpawnLocation());
 
         Random random = ThreadLocalRandom.current();
         int radius = getWorldRadius(world);
@@ -37,7 +36,7 @@ public final class TeleportUtils {
         int z = centerZ + random.nextInt(-radius, radius + 1);
 
         return PaperLib.getChunkAtAsync(world, x >> 4, z >> 4, true).thenCompose(chunk -> {
-            int highestY = chunk.getChunkSnapshot(true, false, false).getHighestBlockYAt(x & 15, z & 15);
+            int highestY = chunk.getWorld().getHighestBlockYAt(x, z);
             Location candidate = new Location(world, x + CENTER_OFFSET, highestY + 1, z + CENTER_OFFSET, center.getYaw(), center.getPitch());
 
             return isLocationSafeAsync(candidate, blacklistedBlocks).thenCompose(safe -> {
@@ -47,24 +46,25 @@ public final class TeleportUtils {
         });
     }
 
-    private static CompletableFuture<Boolean> isLocationSafeAsync(Location location, Set<Material> blacklistedBlocks) {
+    @Contract("_, _ -> new")
+    private static @NotNull CompletableFuture<Boolean> isLocationSafeAsync(Location location, Set<Material> blacklistedBlocks) {
         return CompletableFuture.supplyAsync(() -> {
             World world = location.getWorld();
             int x = location.getBlockX();
             int z = location.getBlockZ();
             int y = location.getBlockY();
 
-            Block groundBlock = world.getBlockAt(x, y - 1, z);
-            if (isBlockUnsafe(groundBlock, blacklistedBlocks, true)) {
-                return false;
-            }
+            return PaperLib.getChunkAtAsync(world, x >> 4, z >> 4, true).thenApply(chunk -> {
+                Block groundBlock = chunk.getBlock(x & 15, y - 1, z & 15);
+                if (isBlockUnsafe(groundBlock, blacklistedBlocks, true)) return false;
 
-            for (int i = 0; i < PLAYER_HEIGHT; i++) {
-                Block currentBlock = world.getBlockAt(x, y + i, z);
-                if (isBlockUnsafe(currentBlock, blacklistedBlocks, false)) return false;
-            }
+                for (int i = 0; i < PLAYER_HEIGHT; i++) {
+                    Block currentBlock = chunk.getBlock(x & 15, y + i, z & 15);
+                    if (isBlockUnsafe(currentBlock, blacklistedBlocks, false)) return false;
+                }
 
-            return true;
+                return true;
+            }).join();
         });
     }
 
@@ -82,9 +82,7 @@ public final class TeleportUtils {
         for (String name : materialNames) {
             try {
                 materials.add(Material.valueOf(name.toUpperCase()));
-            } catch (IllegalArgumentException ignored) {
-                // Ignore invalid materials
-            }
+            } catch (IllegalArgumentException ignored) {}
         }
         return Collections.unmodifiableSet(materials);
     }

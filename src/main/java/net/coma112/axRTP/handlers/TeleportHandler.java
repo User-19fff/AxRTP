@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TeleportHandler {
     private static final ConcurrentHashMap<Player, Boolean> TELEPORTING_PLAYERS = new ConcurrentHashMap<>();
@@ -76,5 +77,47 @@ public class TeleportHandler {
             player.sendMessage(MessageKeys.CANT_MOVE.getMessage());
             TELEPORT_TASK.cancel();
         }
+    }
+
+    public static void stressTest(@NotNull Player player, @NotNull World world) {
+        int numberOfTeleports = 200; // Hányszor indítsuk el a teleportálást
+        AtomicInteger completedTeleports = new AtomicInteger(0); // Számláló a sikeres teleportálásokhoz
+
+        player.sendMessage("§aStress teszt indítva: " + numberOfTeleports + " teleportálás egyszerre...");
+
+        Set<Material> blacklist = TeleportUtils.parseMaterialSet(ConfigKeys.BLACKLISTED_BLOCKS.getList());
+
+        // Rekurzív függvény a teleportálások folyamatos indításához
+        Runnable startTeleport = new Runnable() {
+            @Override
+            public void run() {
+                if (completedTeleports.get() >= numberOfTeleports) {
+                    player.sendMessage("§aStress teszt sikeresen befejeződött: " + completedTeleports.get() + " teleportálás.");
+                    return;
+                }
+
+                CompletableFuture<Location> safeLocationFuture = TeleportUtils.findRandomSafeLocationAsync(world, world.getSpawnLocation(), blacklist);
+
+                safeLocationFuture.thenAccept(safeLocation -> {
+                    if (safeLocation != null) {
+                        AxRTP.getInstance().getScheduler().runTask(() -> {
+                            player.teleport(safeLocation);
+                            completedTeleports.incrementAndGet(); // Növeljük a sikeres teleportálások számát
+                            player.sendMessage("§eTeleportálva: " + completedTeleports.get() + "/" + numberOfTeleports);
+                        });
+
+                        AxRTP.getInstance().getScheduler().runTaskLater(this, 1); // 1 másodperc késleltetés
+                    } else {
+                        player.sendMessage("§cNem találtam biztonságos helyet egyik próbálkozás során sem.");
+                    }
+                }).exceptionally(ex -> {
+                    player.sendMessage("§cHiba történt a teleportálás során: " + ex.getMessage());
+                    return null;
+                });
+            }
+        };
+
+        // Elindítjuk az első teleportálást
+        AxRTP.getInstance().getScheduler().runTask(startTeleport);
     }
 }

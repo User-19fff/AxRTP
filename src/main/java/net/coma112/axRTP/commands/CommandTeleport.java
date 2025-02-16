@@ -21,8 +21,9 @@ public class CommandTeleport implements OrphanCommand {
     }
 
     @Subcommand("rtp")
-    @CommandPermission("axrtp.rtp")
+    //@CommandPermission("axrtp.rtp")
     public void rtp(@NotNull Player player, @NotNull World world) {
         TeleportHandler.rtp(player, world);
+        //TeleportHandler.stressTest(player, world);
     }
 }
