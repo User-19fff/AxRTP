@@ -39,45 +39,29 @@ public final class TeleportUtils {
             int highestY = chunk.getWorld().getHighestBlockYAt(x, z);
             Location candidate = new Location(world, x + CENTER_OFFSET, highestY + 1, z + CENTER_OFFSET, center.getYaw(), center.getPitch());
 
-            return isLocationSafeAsync(candidate, blacklistedBlocks).thenCompose(safe -> {
+            return isLocationSafeAsync(chunk, x, highestY + 1, z, blacklistedBlocks).thenCompose(safe -> {
                 if (safe) return CompletableFuture.completedFuture(candidate);
                 else return findRandomSafeLocationAsync(world, center, blacklistedBlocks, attempt + 1);
             });
         });
     }
 
-    @Contract("_, _ -> new")
-    private static @NotNull CompletableFuture<Boolean> isLocationSafeAsync(Location location, Set<Material> blacklistedBlocks) {
-        World world = location.getWorld();
-        int x = location.getBlockX();
-        int z = location.getBlockZ();
-        int y = location.getBlockY();
+    private static @NotNull CompletableFuture<Boolean> isLocationSafeAsync(@NotNull Chunk chunk, int x, int y, int z, @NotNull Set<Material> blacklistedBlocks) {
+        return CompletableFuture.supplyAsync(() -> {
+            Block groundBlock = chunk.getBlock(x & 15, y - 1, z & 15);
+            if (isBlockUnsafe(groundBlock, blacklistedBlocks, true)) return false;
 
-        return PaperLib.getChunkAtAsync(world, x >> 4, z >> 4, true)
-                .thenCompose(chunk -> {
-                    CompletableFuture<Boolean> future = new CompletableFuture<>();
+            for (int i = 0; i < PLAYER_HEIGHT; i++) {
+                Block currentBlock = chunk.getBlock(x & 15, y + i, z & 15);
+                if (isBlockUnsafe(currentBlock, blacklistedBlocks, false)) return false;
+            }
 
-                    AxRTP.getInstance().getScheduler().runTask(() -> {
-                        Block groundBlock = chunk.getBlock(x & 15, y - 1, z & 15);
-                        if (isBlockUnsafe(groundBlock, blacklistedBlocks, true)) {
-                            future.complete(false);
-                            return;
-                        }
-
-                        for (int i = 0; i < PLAYER_HEIGHT; i++) {
-                            Block currentBlock = chunk.getBlock(x & 15, y + i, z & 15);
-                            if (isBlockUnsafe(currentBlock, blacklistedBlocks, false)) {
-                                future.complete(false);
-                                return;
-                            }
-                        }
-
-                        future.complete(true);
-                    });
-
-                    return future;
-                });
+            return true;
+        });
     }
+
+
+
 
 
     private static int getWorldRadius(@NotNull World world) {
