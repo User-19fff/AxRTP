@@ -39,6 +39,12 @@ public enum ConfigKeys {
     SOUND_ENABLED("sound.enabled"),
     SOUND_LIST("sound.list"),
 
+    PARTICLE_ENABLED("particle.enabled"),
+    PARTICLE_DISPLAY("particle.display"),
+
+    EFFECTS_ENABLED("effects.enabled"),
+    EFFECTS_LIST("effects.list"),
+
     WORLDS("world-radius");
 
     private final String path;

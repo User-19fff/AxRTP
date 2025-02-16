@@ -57,6 +57,8 @@ public class TeleportHandler {
                                         ConfigKeys.TITLE_TEXT.getString(),
                                         ConfigKeys.TITLE_SUBTITLE.getString());
                                 PlayerFeedbackUtils.playSounds(player);
+                                PlayerFeedbackUtils.showParticles(player);
+                                PlayerFeedbackUtils.applyEffects(player);
 
                                 if (ConfigKeys.TELEPORT_COOLDOWN_ENABLED.getBoolean()) CooldownHandler.setCooldown(player, ConfigKeys.TELEPORT_COOLDOWN_TIME.getInt(), TimeUnit.SECONDS);
                             } else player.sendMessage(MessageKeys.NO_PLACE.getMessage());

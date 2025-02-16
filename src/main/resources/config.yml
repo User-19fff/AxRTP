@@ -1,47 +1,74 @@
-language: "hu"
+language: "hu" # Language of the plugin (Hungarian).
 
 aliases:
+  # Alternate command names that players can use to activate RTP.
   - "rtp"
   - "axrtp"
 
 teleport:
-  maximum-attempts: 32
+  # Teleportation settings.
+  maximum-attempts: 32 # Maximum number of attempts to find a safe location before giving up.
   teleport-on-first-join:
-    enabled: false
-    world: "world"
+    # Teleport players to a random location on their first join (new players).
+    enabled: false # Whether this feature is enabled.
+    world: "world" # The world in which to teleport new players.
   cooldown:
-    enabled: false
-    time: 30
-    lock-after: 0 # 0 if disabled.
+    # Cooldown period between teleports.
+    enabled: false # Whether the cooldown is enabled.
+    time: 30 # Cooldown time in seconds.
+    lock-after: 0 # 0 if disabled. If there is a time limit, specify the number of minutes to wait before the cooldown is lifted.
   delay:
-    enabled: true
-    time: 3
-    sound: "BLOCK_ANVIL_PLACE"
-    cancel-on-move: false
+    # Delay before teleporting.
+    enabled: true # Whether the delay is enabled.
+    time: 3 # Delay time in seconds.
+    sound: "BLOCK_ANVIL_PLACE" # Sound to play during the delay.
+    cancel-on-move: false # Whether to cancel the teleport if the player moves.
     title:
-      enabled: true
-      title: "&aTeleportálás"
-      subtitle: "&e{time}"
+      # Title and subtitle to display during the delay.
+      enabled: true # Whether to display the title.
+      title: "&aTeleporting in" # Main title.
+      subtitle: "&2{time}" # Subtitle, which displays the remaining time ( {time} is replaced with the remaining time).
 
 blacklisted-blocks:
-  - "WATER"
-  - "LAVA"
-  - "CACTUS"
-  - "KELP"
+  # List of blocks to avoid when teleporting. Players will not be teleported into these blocks.
+  # See more -> https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html
+  - "WATER" # Water
+  - "LAVA" # Lava
+  - "CACTUS" # Cactus
+  - "KELP" # Kelp (seaweed)
 
 blacklisted-worlds:
-  - "world_nether"
-  - "world_the_end"
+  # List of worlds to avoid when teleporting.
+  - "world_nether" # Nether world
+  - "world_the_end" # The End world
 
 title:
-  enabled: true
-  title: "&aElteleportálva!"
-  subtitle: "&eJó kalandozást!"
+  # Title and subtitle to display after teleporting.
+  enabled: true # Whether to display the title.
+  title: "&aTeleported!" # Main title.
+  subtitle: "&eGood luck exploring!" # Subtitle.
+
 sound:
-  enabled: true
+  # Sound effects to play after teleporting.
+  enabled: true # Whether to play sound effects.
   list:
-    - "UI_BUTTON_CLICK"
+    # See more -> https://jd.papermc.io/paper/1.21.1/org/bukkit/Sound.html
+    - "UI_BUTTON_CLICK" # List of sounds to play.
+
+particle:
+  # Particle effects to display when teleporting.
+  enabled: true # Whether to display particle effects.
+  display: "CRIT_MAGIC" # Type of particle effect to display.
+
+effects:
+  # Effects (e.g. status effects) to apply when teleporting.
+  enabled: true # Whether to apply effects.
+  list:
+    # See more -> https://jd.papermc.io/paper/1.21.4/org/bukkit/potion/PotionEffectType.html
+    - "BLINDNESS:3:1" # Blindness effect, lasting 5 seconds, with an amplifier of 1.
+    - "SLOWNESS:3:1" # Slowness effect, lasting 5 seconds, with an amplifier of 1.
 
 world-radius:
-  world: 50
-  world_nether: 1000
+  # World-specific radius settings.
+  world: 100 # Radius for the "world" world.
+  world_nether: 1000 # Radius for the "world_nether" world.
