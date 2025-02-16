@@ -48,25 +48,37 @@ public final class TeleportUtils {
 
     @Contract("_, _ -> new")
     private static @NotNull CompletableFuture<Boolean> isLocationSafeAsync(Location location, Set<Material> blacklistedBlocks) {
-        return CompletableFuture.supplyAsync(() -> {
-            World world = location.getWorld();
-            int x = location.getBlockX();
-            int z = location.getBlockZ();
-            int y = location.getBlockY();
+        World world = location.getWorld();
+        int x = location.getBlockX();
+        int z = location.getBlockZ();
+        int y = location.getBlockY();
 
-            return PaperLib.getChunkAtAsync(world, x >> 4, z >> 4, true).thenApply(chunk -> {
-                Block groundBlock = chunk.getBlock(x & 15, y - 1, z & 15);
-                if (isBlockUnsafe(groundBlock, blacklistedBlocks, true)) return false;
+        return PaperLib.getChunkAtAsync(world, x >> 4, z >> 4, true)
+                .thenCompose(chunk -> {
+                    CompletableFuture<Boolean> future = new CompletableFuture<>();
 
-                for (int i = 0; i < PLAYER_HEIGHT; i++) {
-                    Block currentBlock = chunk.getBlock(x & 15, y + i, z & 15);
-                    if (isBlockUnsafe(currentBlock, blacklistedBlocks, false)) return false;
-                }
+                    AxRTP.getInstance().getScheduler().runTask(() -> {
+                        Block groundBlock = chunk.getBlock(x & 15, y - 1, z & 15);
+                        if (isBlockUnsafe(groundBlock, blacklistedBlocks, true)) {
+                            future.complete(false);
+                            return;
+                        }
 
-                return true;
-            }).join();
-        });
+                        for (int i = 0; i < PLAYER_HEIGHT; i++) {
+                            Block currentBlock = chunk.getBlock(x & 15, y + i, z & 15);
+                            if (isBlockUnsafe(currentBlock, blacklistedBlocks, false)) {
+                                future.complete(false);
+                                return;
+                            }
+                        }
+
+                        future.complete(true);
+                    });
+
+                    return future;
+                });
     }
+
 
     private static int getWorldRadius(@NotNull World world) {
         return AxRTP.getInstance().getConfiguration().getHandler().getInt("world-radius." + world.getName());
