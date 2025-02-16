@@ -1,6 +1,7 @@
 package net.coma112.axrtp.handlers;
 
 import com.github.Anon8281.universalScheduler.scheduling.tasks.MyScheduledTask;
+import io.papermc.lib.PaperLib;
 import net.coma112.axrtp.AxRTP;
 import net.coma112.axrtp.identifiers.keys.ConfigKeys;
 import net.coma112.axrtp.identifiers.keys.MessageKeys;
@@ -49,16 +50,17 @@ public class TeleportHandler {
             } else {
                 safeLocationFuture.thenAccept(safeLocation -> {
                     if (safeLocation != null) {
-                        AxRTP.getInstance().getScheduler().runTask(() -> player.teleport(safeLocation));
-                        PlayerFeedbackUtils.sendTitle(player,
-                                ConfigKeys.TITLE_ENABLED.getBoolean(),
-                                ConfigKeys.TITLE_TEXT.getString(),
-                                ConfigKeys.TITLE_SUBTITLE.getString());
-                        PlayerFeedbackUtils.playSounds(player);
+                        PaperLib.teleportAsync(player, safeLocation).thenAccept(success -> {
+                            if (success) {
+                                PlayerFeedbackUtils.sendTitle(player,
+                                        ConfigKeys.TITLE_ENABLED.getBoolean(),
+                                        ConfigKeys.TITLE_TEXT.getString(),
+                                        ConfigKeys.TITLE_SUBTITLE.getString());
+                                PlayerFeedbackUtils.playSounds(player);
 
-                        if (ConfigKeys.TELEPORT_COOLDOWN_ENABLED.getBoolean()) {
-                            CooldownHandler.setCooldown(player, ConfigKeys.TELEPORT_COOLDOWN_TIME.getInt(), TimeUnit.SECONDS);
-                        }
+                                if (ConfigKeys.TELEPORT_COOLDOWN_ENABLED.getBoolean()) CooldownHandler.setCooldown(player, ConfigKeys.TELEPORT_COOLDOWN_TIME.getInt(), TimeUnit.SECONDS);
+                            } else player.sendMessage(MessageKeys.NO_PLACE.getMessage());
+                        });
                     } else player.sendMessage(MessageKeys.NO_PLACE.getMessage());
                 });
 
@@ -80,14 +82,13 @@ public class TeleportHandler {
     }
 
     public static void stressTest(@NotNull Player player, @NotNull World world) {
-        int numberOfTeleports = 200; // Hányszor indítsuk el a teleportálást
-        AtomicInteger completedTeleports = new AtomicInteger(0); // Számláló a sikeres teleportálásokhoz
+        int numberOfTeleports = 200;
+        AtomicInteger completedTeleports = new AtomicInteger(0);
 
         player.sendMessage("§aStress teszt indítva: " + numberOfTeleports + " teleportálás egyszerre...");
 
         Set<Material> blacklist = TeleportUtils.parseMaterialSet(ConfigKeys.BLACKLISTED_BLOCKS.getList());
 
-        // Rekurzív függvény a teleportálások folyamatos indításához
         Runnable startTeleport = new Runnable() {
             @Override
             public void run() {
@@ -100,13 +101,16 @@ public class TeleportHandler {
 
                 safeLocationFuture.thenAccept(safeLocation -> {
                     if (safeLocation != null) {
-                        AxRTP.getInstance().getScheduler().runTask(() -> {
-                            player.teleport(safeLocation);
-                            completedTeleports.incrementAndGet(); // Növeljük a sikeres teleportálások számát
-                            player.sendMessage("§eTeleportálva: " + completedTeleports.get() + "/" + numberOfTeleports);
+                        PaperLib.teleportAsync(player, safeLocation).thenAccept(success -> {
+                            if (success) {
+                                completedTeleports.incrementAndGet();
+                                player.sendMessage("§eTeleportálva: " + completedTeleports.get() + "/" + numberOfTeleports);
+                            } else {
+                                player.sendMessage("§cNem sikerült teleportálni.");
+                            }
                         });
 
-                        AxRTP.getInstance().getScheduler().runTaskLater(this, 1); // 1 másodperc késleltetés
+                        AxRTP.getInstance().getScheduler().runTaskLater(this, 1);
                     } else {
                         player.sendMessage("§cNem találtam biztonságos helyet egyik próbálkozás során sem.");
                     }
@@ -117,7 +121,6 @@ public class TeleportHandler {
             }
         };
 
-        // Elindítjuk az első teleportálást
         AxRTP.getInstance().getScheduler().runTask(startTeleport);
     }
 }

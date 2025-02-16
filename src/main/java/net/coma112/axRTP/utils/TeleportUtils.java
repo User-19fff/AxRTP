@@ -48,7 +48,6 @@ public final class TeleportUtils {
             if (isLocationSafe(chunk, x, highestY + 1, z, blacklistedBlocks)) return CompletableFuture.completedFuture(candidate);
             else return findRandomSafeLocationAsync(world, center, blacklistedBlocks, attempt + 1);
         });
-
     }
 
     private static boolean isLocationSafe(@NotNull Chunk chunk, int x, int y, int z, @NotNull Set<Material> blacklistedBlocks) {
@@ -62,7 +61,6 @@ public final class TeleportUtils {
 
         return true;
     }
-
 
     private static int getWorldRadius(@NotNull World world) {
         return AxRTP.getInstance().getConfiguration().getHandler().getInt("world-radius." + world.getName());
