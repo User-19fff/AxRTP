@@ -17,7 +17,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class TeleportHandler {
     private static final ConcurrentHashMap<Player, Boolean> TELEPORTING_PLAYERS = new ConcurrentHashMap<>();
@@ -38,6 +37,8 @@ public class TeleportHandler {
         final int[] timeLeft = {ConfigKeys.TELEPORT_DELAY_TIME.getInt()};
 
         if (ConfigKeys.TELEPORT_DELAY_CANCEL_ON_MOVE.getBoolean()) TELEPORTING_PLAYERS.put(player, true);
+
+        if (!PlayerFeedbackUtils.deductMoney(player, world)) return;
 
         teleportTask = AxRTP.getInstance().getScheduler().runTaskTimer(() -> {
             if (timeLeft[0] > 0) {

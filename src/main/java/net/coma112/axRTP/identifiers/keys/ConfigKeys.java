@@ -49,6 +49,11 @@ public enum ConfigKeys {
     COMMAND_ON_RTP_ENABLED("commands-on-rtp.enabled"),
     COMMAND_ON_RTP_LIST("commands-on-rtp.enabled"),
 
+    PRICES_ENABLED("prices.enabled"),
+    PRICES_LIST("prices.list"),
+
+    RESPECT_WORLDGUARD("respect.worldguard"),
+
     WORLDS("world-radius");
 
     private final String path;

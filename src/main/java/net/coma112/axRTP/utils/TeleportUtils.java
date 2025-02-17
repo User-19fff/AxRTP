@@ -4,8 +4,8 @@ import io.papermc.lib.PaperLib;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.coma112.axrtp.AxRTP;
+import net.coma112.axrtp.hooks.WorldGuard;
 import net.coma112.axrtp.identifiers.keys.ConfigKeys;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -34,20 +34,18 @@ public final class TeleportUtils {
         reloadBlacklistedBiomes();
     }
 
-    public static void reloadBlacklistedBiomes() {
-        List<String> entries = AxRTP.getInstance().getConfiguration().getHandler().getList("blacklisted-biomes");
-
-        BLACKLISTED_BIOMES.clear();
-        entries.stream()
-                .map(entry -> entry.split(":"))
-                .filter(parts -> parts.length == PLAYER_HEIGHT)
-                .forEach(parts -> BLACKLISTED_BIOMES
-                        .computeIfAbsent(parts[1], k -> ConcurrentHashMap.newKeySet())
-                        .add(parts[0].toUpperCase()));
-    }
-
     public static CompletableFuture<Location> findRandomSafeLocationAsync(World world, Location center, Set<Material> blacklistedBlocks) {
         return findRandomSafeLocationAsync(world, center, blacklistedBlocks, 0);
+    }
+
+    public static @NotNull @UnmodifiableView Set<Material> parseMaterialSet(@NotNull Iterable<String> materialNames) {
+        Set<Material> materials = new HashSet<>();
+        for (String name : materialNames) {
+            try {
+                materials.add(Material.valueOf(name.toUpperCase()));
+            } catch (IllegalArgumentException ignored) {}
+        }
+        return Collections.unmodifiableSet(materials);
     }
 
     private static CompletableFuture<Location> findRandomSafeLocationAsync(World world, Location center, Set<Material> blacklistedBlocks, int attempt) {
@@ -72,7 +70,7 @@ public final class TeleportUtils {
         });
     }
 
-    private static boolean isLocationSafe(Location location, Set<Material> blacklistedBlocks) {
+    private static boolean isLocationSafe(@NotNull Location location, Set<Material> blacklistedBlocks) {
         World world = location.getWorld();
         int x = location.getBlockX();
         int y = location.getBlockY();
@@ -85,6 +83,7 @@ public final class TeleportUtils {
         String biomeName = world.getBiome(x, y, z).name();
 
         if (BLACKLISTED_BIOMES.getOrDefault(worldName, Collections.emptySet()).contains(biomeName)) return false;
+        if (ConfigKeys.RESPECT_WORLDGUARD.getBoolean() && WorldGuard.isInWorldGuardRegion(location)) return false;
 
         for (int i = 0; i < PLAYER_HEIGHT; i++) {
             Block block = world.getBlockAt(x, y + i, z);
@@ -103,13 +102,15 @@ public final class TeleportUtils {
         return blacklistedBlocks.contains(material) || (isGround != material.isSolid());
     }
 
-    public static @NotNull @UnmodifiableView Set<Material> parseMaterialSet(@NotNull Iterable<String> materialNames) {
-        Set<Material> materials = new HashSet<>();
-        for (String name : materialNames) {
-            try {
-                materials.add(Material.valueOf(name.toUpperCase()));
-            } catch (IllegalArgumentException ignored) {}
-        }
-        return Collections.unmodifiableSet(materials);
+    private static void reloadBlacklistedBiomes() {
+        List<String> entries = AxRTP.getInstance().getConfiguration().getHandler().getList("blacklisted-biomes");
+
+        BLACKLISTED_BIOMES.clear();
+        entries.stream()
+                .map(entry -> entry.split(":"))
+                .filter(parts -> parts.length == PLAYER_HEIGHT)
+                .forEach(parts -> BLACKLISTED_BIOMES
+                        .computeIfAbsent(parts[1], k -> ConcurrentHashMap.newKeySet())
+                        .add(parts[0].toUpperCase()));
     }
 }

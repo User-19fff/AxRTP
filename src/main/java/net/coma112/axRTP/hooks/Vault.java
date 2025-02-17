@@ -28,4 +28,8 @@ public class Vault {
         if (economy == null) return true;
         return economy.getBalance(player) >= amount;
     }
+
+    public static void deductMoney(@NotNull Player player, double amount) {
+        economy.withdrawPlayer(player, amount);
+    }
 }

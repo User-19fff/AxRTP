@@ -3,4 +3,4 @@ version: '1.0.0'
 main: net.coma112.axrtp.AxRTP
 api-version: '1.21'
 authors: [coma]
-softdepend: [PlaceholderAPI, Vault]
+softdepend: [PlaceholderAPI, Vault, WorldGuard]

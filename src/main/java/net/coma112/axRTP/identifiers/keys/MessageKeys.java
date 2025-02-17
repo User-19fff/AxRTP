@@ -17,6 +17,7 @@ public enum MessageKeys {
     NO_PERMISSION("messages.no-permission"),
     NO_PLACE("messages.no-place"),
     NOT_ON_COOLDOWN("messages.not-on-cooldown"),
+    NOT_ENOUGH_MONEY("messages.not-enough-money"),
 
     LOCKDOWN("messages.lockdown"),
     COOLDOWN("messages.cooldown"),

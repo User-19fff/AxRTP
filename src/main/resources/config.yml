@@ -80,4 +80,13 @@ commands-on-rtp:
     - "msg %player% you have just RTPd nice job ig!" # It automatically replaces %player% with the name of the player.
 
 blacklisted-biomes: # {biome}:{world's name}
-  - "FOREST:world" # In this concept you won't be able to teleport in a forest biome in world.
+  - "DESERT:world" # In this concept you won't be able to teleport in a forest biome in world.
+
+prices:
+  enabled: false # Requires VAULT PLUGIN!
+  list: # {price}:{world's name}
+    "100:world"
+    "200:world_nether"
+
+respect:
+  worldguard: false

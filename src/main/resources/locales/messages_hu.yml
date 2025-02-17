@@ -11,3 +11,4 @@ messages:
   success-reset-lockdown: "%prefix% &aSikeresen resetelted a lockdownt a játékoson!"
   not-on-cooldown: "%prefix% &cEz a játékos nincsen cooldown alatt!"
   success-reset-cooldown: "%prefix% &aSikeresen eltávolítottad a cooldownt a játékosról!"
+  not-enough-money: "%prefix% &cNincsen elég pénzed ehhez!"

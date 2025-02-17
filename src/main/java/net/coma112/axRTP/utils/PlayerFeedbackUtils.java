@@ -1,11 +1,15 @@
 package net.coma112.axrtp.utils;
 
 import lombok.experimental.UtilityClass;
+import net.coma112.axrtp.AxRTP;
+import net.coma112.axrtp.hooks.Vault;
 import net.coma112.axrtp.identifiers.keys.ConfigKeys;
+import net.coma112.axrtp.identifiers.keys.MessageKeys;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -14,7 +18,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @UtilityClass
 @SuppressWarnings("deprecation")
@@ -24,7 +31,12 @@ public class PlayerFeedbackUtils {
     private final double RADIUS = 1.5;
     private final List<Location> cachedOffsets = new ArrayList<>();
 
+    private static final ConcurrentMap<Integer, Set<String>> PRICES = new ConcurrentHashMap<>();
+
+
     static {
+        reloadPrices();
+
         for (int i = 0; i < POINTS; i++) {
             double theta = Math.toRadians(i * (360.0 / POINTS));
             for (int j = -90; j <= 90; j += (180 / VERTICAL_STEPS)) {
@@ -36,6 +48,18 @@ public class PlayerFeedbackUtils {
                 cachedOffsets.add(new Location(null, x, y, z));
             }
         }
+    }
+
+    private static void reloadPrices() {
+        List<String> entries = AxRTP.getInstance().getConfiguration().getHandler().getList("blacklisted-biomes");
+
+        PRICES.clear();
+        entries.stream()
+                .map(entry -> entry.split(":"))
+                .filter(parts -> parts.length == 2)
+                .forEach(parts -> PRICES
+                        .computeIfAbsent(Integer.valueOf(parts[1]), k -> ConcurrentHashMap.newKeySet())
+                        .add(parts[0].toUpperCase()));
     }
 
     public void showParticles(@NotNull Player player) {
@@ -55,10 +79,10 @@ public class PlayerFeedbackUtils {
         });
     }
 
-    private @Nullable Particle getParticleSafe(String particleName) {
+    private @Nullable Particle getParticleSafe(@NotNull String particleName) {
         try {
             return Particle.valueOf(particleName);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignored) {
             return null;
         }
     }
@@ -111,5 +135,32 @@ public class PlayerFeedbackUtils {
 
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), replacedCommand);
         }
+    }
+
+    public static boolean deductMoney(@NotNull Player player, @NotNull World world) {
+        if (!ConfigKeys.PRICES_ENABLED.getBoolean()) {
+            return true;
+        }
+
+        String worldName = world.getName();
+        List<String> priceEntries = ConfigKeys.PRICES_LIST.getList();
+
+        for (String entry : priceEntries) {
+            String[] parts = entry.split(":");
+
+            if (parts.length == 2 && parts[1].equalsIgnoreCase(worldName)) {
+                int price = Integer.parseInt(parts[0]);
+
+                    if (Vault.hasEnoughMoney(player, price)) {
+                        Vault.deductMoney(player, price);
+                        return true;
+                    } else {
+                        player.sendMessage(MessageKeys.NOT_ENOUGH_MONEY.getMessage());
+                        return false;
+                    }
+                }
+            }
+
+        return true;
     }
 }
