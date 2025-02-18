@@ -34,7 +34,6 @@ public final class AxRTP extends ZapperJavaPlugin {
 
         RegisterUtils.registerCommands();
         RegisterUtils.registerListeners();
-        PlaceholderAPI.registerHook();
 
         lockdownHandler = new LockdownHandler(new HashMap<>(), ConfigKeys.TELEPORT_COOLDOWN_LOCK_AFTER.getInt());
         cooldownHandler = new CooldownHandler();
