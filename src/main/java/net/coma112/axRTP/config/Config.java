@@ -2,7 +2,7 @@ package net.coma112.axrtp.config;
 
 import lombok.Getter;
 import net.coma112.axrtp.AxRTP;
-import net.coma112.axrtp.handlers.ConfigurationHandler;
+import net.coma112.axrtp.handlers.config.ConfigurationHandler;
 
 @Getter
 public class Config {

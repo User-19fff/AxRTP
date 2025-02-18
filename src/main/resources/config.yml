@@ -1,5 +1,3 @@
-language: "hu" # Language of the plugin (Hungarian).
-
 aliases:
   # Alternate command names that players can use to activate RTP.
   - "rtp"
@@ -55,11 +53,6 @@ sound:
     # See more -> https://jd.papermc.io/paper/1.21.1/org/bukkit/Sound.html
     - "UI_BUTTON_CLICK" # List of sounds to play.
 
-particle:
-  # Particle effects to display when teleporting.
-  enabled: true # Whether to display particle effects.
-  display: "CRIT_MAGIC" # Type of particle effect to display.
-
 effects:
   # Effects (e.g. status effects) to apply when teleporting.
   enabled: true # Whether to apply effects.
@@ -77,7 +70,8 @@ commands-on-rtp:
   # Commands to run when the player's RTPd.
   enabled: true
   list:
-    - "msg %player% you have just RTPd nice job ig!" # It automatically replaces %player% with the name of the player.
+    - "world: msg %player% you have just RTPd to world" # It automatically replaces %player% with the name of the player.
+    - "world_nether: msg %player% nether"
 
 blacklisted-biomes: # {biome}:{world's name}
   - "DESERT:world" # In this concept you won't be able to teleport in a forest biome in world.
@@ -85,8 +79,29 @@ blacklisted-biomes: # {biome}:{world's name}
 prices:
   enabled: false # Requires VAULT PLUGIN!
   list: # {price}:{world's name}
-    "100:world"
-    "200:world_nether"
+    - "100:world" # To use other currencies you should use the currency plugin's take command to take it from the player! WITH commands-on-rtp setting!
+    - "200:world_nether"
 
-respect:
+respect: # If a value is true like worldguard then the player won't be able to teleport into a protected region.
   worldguard: false
+
+particle:
+  enabled: true # Disable if you don't want particles to be shown to the player
+  pattern: "sphere"
+  patterns:
+    sphere:
+      formula-x: "RADIUS * Math.cos(T)"
+      formula-y: "RADIUS * Math.sin(T)"
+      formula-z: "0"
+      points: 50
+      radius: 1.5
+      particle: "CRIT_MAGIC"
+    spiral:
+      formula-x: "T * Math.cos(T)"
+      formula-y: "T / 10"
+      formula-z: "T * Math.sin(T)"
+      points: 100
+      radius: 3
+      particle: "FLAME"
+
+centers: []

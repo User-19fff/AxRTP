@@ -10,7 +10,6 @@ import java.util.List;
 
 @Getter
 public enum ConfigKeys {
-    LANGUAGE("language"),
     ALIASES("aliases"),
 
     TELEPORT_MAXIMUM_ATTEMPTS("teleport.maximum-attempts"),
@@ -32,6 +31,7 @@ public enum ConfigKeys {
 
     BLACKLISTED_BLOCKS("blacklisted-blocks"),
     BLACKLISTED_WORLDS("blacklisted-worlds"),
+    BLACKLISTED_BIOMES("blacklisted-biomes"),
 
     TITLE_ENABLED("title.enabled"),
     TITLE_TEXT("title.title"),
@@ -41,13 +41,13 @@ public enum ConfigKeys {
     SOUND_LIST("sound.list"),
 
     PARTICLE_ENABLED("particle.enabled"),
-    PARTICLE_DISPLAY("particle.display"),
+    PARTICLE_PATTERN("particle.pattern"),
 
     EFFECTS_ENABLED("effects.enabled"),
     EFFECTS_LIST("effects.list"),
 
     COMMAND_ON_RTP_ENABLED("commands-on-rtp.enabled"),
-    COMMAND_ON_RTP_LIST("commands-on-rtp.enabled"),
+    COMMAND_ON_RTP_LIST("commands-on-rtp.list"),
 
     PRICES_ENABLED("prices.enabled"),
     PRICES_LIST("prices.list"),
@@ -57,7 +57,7 @@ public enum ConfigKeys {
     WORLDS("world-radius");
 
     private final String path;
-    private final Config config = AxRTP.getInstance().getConfiguration();
+    private static final Config config = AxRTP.getInstance().getConfiguration();
 
     ConfigKeys(@NotNull String path) {
         this.path = path;
@@ -65,6 +65,10 @@ public enum ConfigKeys {
 
     public @NotNull String getString() {
         return MessageProcessor.process(config.getHandler().getString(path));
+    }
+
+    public static @NotNull String getString(@NotNull String path) {
+        return config.getHandler().getString(path);
     }
 
     public boolean getBoolean() {

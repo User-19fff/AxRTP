@@ -1,10 +1,12 @@
-package net.coma112.axrtp.handlers;
+package net.coma112.axrtp.handlers.utils;
 
 import com.github.Anon8281.universalScheduler.scheduling.tasks.MyScheduledTask;
 import io.papermc.lib.PaperLib;
 import net.coma112.axrtp.AxRTP;
 import net.coma112.axrtp.identifiers.keys.ConfigKeys;
 import net.coma112.axrtp.identifiers.keys.MessageKeys;
+import net.coma112.axrtp.processor.ParticleProcessor;
+import net.coma112.axrtp.utils.LocationUtils;
 import net.coma112.axrtp.utils.PlayerFeedbackUtils;
 import net.coma112.axrtp.utils.TeleportUtils;
 import org.bukkit.Location;
@@ -33,7 +35,8 @@ public class TeleportHandler {
         }
 
         Set<Material> blacklist = TeleportUtils.parseMaterialSet(ConfigKeys.BLACKLISTED_BLOCKS.getList());
-        CompletableFuture<Location> safeLocationFuture = TeleportUtils.findRandomSafeLocationAsync(world, world.getSpawnLocation(), blacklist);
+        Location center = AxRTP.getInstance().getConfig().getString("centers." + world.getName()) == null ? world.getSpawnLocation() : LocationUtils.convertStringToLocation(AxRTP.getInstance().getConfig().getString("centers." + world.getName()));
+        CompletableFuture<Location> safeLocationFuture = TeleportUtils.findRandomSafeLocationAsync(world, center, blacklist);
         final int[] timeLeft = {ConfigKeys.TELEPORT_DELAY_TIME.getInt()};
 
         if (ConfigKeys.TELEPORT_DELAY_CANCEL_ON_MOVE.getBoolean()) TELEPORTING_PLAYERS.put(player, true);
@@ -59,7 +62,13 @@ public class TeleportHandler {
                                         ConfigKeys.TITLE_TEXT.getString(),
                                         ConfigKeys.TITLE_SUBTITLE.getString());
                                 PlayerFeedbackUtils.playSounds(player);
-                                PlayerFeedbackUtils.showParticles(player);
+                                //PlayerFeedbackUtils.showParticles(player);
+                                //ParticleProcessor.showParticles(player);
+
+                                AxRTP.getInstance().getScheduler().runTask(() -> {
+                                    ParticleProcessor.showParticles(player);
+                                });
+
                                 PlayerFeedbackUtils.applyEffects(player);
                                 PlayerFeedbackUtils.runCommands(player);
 

@@ -1,4 +1,4 @@
-package net.coma112.axrtp.handlers;
+package net.coma112.axrtp.handlers.utils;
 
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;

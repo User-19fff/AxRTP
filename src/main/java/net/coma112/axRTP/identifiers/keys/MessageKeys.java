@@ -10,9 +10,14 @@ import java.util.List;
 @Getter
 public enum MessageKeys {
     RELOAD("messages.reload"),
+    HELP("messages.help"),
+
+    MISSING_ARGUMENT("messages.missing-argument"),
+    PLAYER_REQUIRED("messages.player-required"),
 
     SUCCESS_RESET_LOCKDOWN("messages.success-reset-lockdown"),
     SUCCESS_RESET_COOLDOWN("messages.success-reset-cooldown"),
+    SUCCESS_SET_CENTER("messages.success-center-set"),
 
     NO_PERMISSION("messages.no-permission"),
     NO_PLACE("messages.no-place"),

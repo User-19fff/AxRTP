@@ -34,7 +34,6 @@ public class RegisterUtils {
                 .build();
 
         lamp.register(Orphans.path(ConfigKeys.ALIASES.getList().toArray(String[]::new)).handler(new CommandTeleport()));
-
         LoggerUtils.info("### Successfully registered exception handlers... ###");
     }
 

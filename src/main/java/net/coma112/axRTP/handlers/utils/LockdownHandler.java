@@ -1,4 +1,4 @@
-package net.coma112.axrtp.handlers;
+package net.coma112.axrtp.handlers.utils;
 
 import lombok.RequiredArgsConstructor;
 import net.coma112.axrtp.data.PlayerRTPState;

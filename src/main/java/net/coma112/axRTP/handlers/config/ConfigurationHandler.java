@@ -1,4 +1,4 @@
-package net.coma112.axrtp.handlers;
+package net.coma112.axrtp.handlers.config;
 
 import lombok.extern.slf4j.Slf4j;
 import net.coma112.axrtp.AxRTP;
@@ -89,6 +89,10 @@ public class ConfigurationHandler {
 
     public String getString(@NotNull String path) {
         return yml.getString(path);
+    }
+
+    public double getDouble(@NotNull String path) {
+        return yml.getDouble(path);
     }
 
     public @Nullable ConfigurationSection getSection(@NotNull String path) {

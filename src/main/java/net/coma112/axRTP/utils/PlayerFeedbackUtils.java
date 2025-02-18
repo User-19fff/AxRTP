@@ -1,7 +1,6 @@
 package net.coma112.axrtp.utils;
 
 import lombok.experimental.UtilityClass;
-import net.coma112.axrtp.AxRTP;
 import net.coma112.axrtp.hooks.Vault;
 import net.coma112.axrtp.identifiers.keys.ConfigKeys;
 import net.coma112.axrtp.identifiers.keys.MessageKeys;
@@ -33,7 +32,6 @@ public class PlayerFeedbackUtils {
 
     private static final ConcurrentMap<Integer, Set<String>> PRICES = new ConcurrentHashMap<>();
 
-
     static {
         reloadPrices();
 
@@ -50,41 +48,16 @@ public class PlayerFeedbackUtils {
         }
     }
 
-    private static void reloadPrices() {
-        List<String> entries = AxRTP.getInstance().getConfiguration().getHandler().getList("blacklisted-biomes");
+    public static void reloadPrices() {
+        List<String> entries = ConfigKeys.PRICES_LIST.getList();
 
         PRICES.clear();
         entries.stream()
                 .map(entry -> entry.split(":"))
                 .filter(parts -> parts.length == 2)
                 .forEach(parts -> PRICES
-                        .computeIfAbsent(Integer.valueOf(parts[1]), k -> ConcurrentHashMap.newKeySet())
-                        .add(parts[0].toUpperCase()));
-    }
-
-    public void showParticles(@NotNull Player player) {
-        if (!ConfigKeys.PARTICLE_ENABLED.getBoolean()) return;
-
-        String particleName = ConfigKeys.PARTICLE_DISPLAY.getString();
-        Particle particle = getParticleSafe(particleName);
-        if (particle == null) return;
-
-        Location baseLocation = player.getLocation().add(0, 1, 0);
-
-        CompletableFuture.runAsync(() -> {
-            cachedOffsets.forEach(offset -> {
-                Location particleLoc = baseLocation.clone().add(offset.getX(), offset.getY(), offset.getZ());
-                player.getWorld().spawnParticle(particle, particleLoc, 1);
-            });
-        });
-    }
-
-    private @Nullable Particle getParticleSafe(@NotNull String particleName) {
-        try {
-            return Particle.valueOf(particleName);
-        } catch (IllegalArgumentException ignored) {
-            return null;
-        }
+                        .computeIfAbsent(Integer.valueOf(parts[0]), k -> ConcurrentHashMap.newKeySet())
+                        .add(parts[1].toUpperCase()));
     }
 
     public void sendTitle(@NotNull Player player, boolean isEnabled, @Nullable String title, @Nullable String subtitle) {
@@ -128,14 +101,23 @@ public class PlayerFeedbackUtils {
     public void runCommands(@NotNull Player player) {
         if (!ConfigKeys.COMMAND_ON_RTP_ENABLED.getBoolean()) return;
 
-        List<String> commands = ConfigKeys.EFFECTS_LIST.getList();
+        List<String> commands = ConfigKeys.COMMAND_ON_RTP_LIST.getList();
+        String playerWorld = player.getWorld().getName();
 
-        for (String command : commands) {
-            String replacedCommand = command.replace("%player%", player.getName());
+        for (String entry : commands) {
+            String[] parts = entry.split(":", 2);
+            if (parts.length < 2) continue;
 
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), replacedCommand);
+            String worldName = parts[0].trim();
+            String command = parts[1].trim();
+
+            if (worldName.equalsIgnoreCase(playerWorld)) {
+                String replacedCommand = command.replace("%player%", player.getName());
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), replacedCommand);
+            }
         }
     }
+
 
     public static boolean deductMoney(@NotNull Player player, @NotNull World world) {
         if (!ConfigKeys.PRICES_ENABLED.getBoolean()) {

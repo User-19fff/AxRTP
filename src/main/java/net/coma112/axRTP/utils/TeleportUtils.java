@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
 
@@ -22,6 +23,8 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -29,12 +32,25 @@ public final class TeleportUtils {
     private static final ConcurrentMap<String, Set<String>> BLACKLISTED_BIOMES = new ConcurrentHashMap<>();
     private static final int PLAYER_HEIGHT = 2;
     private static final double CENTER_OFFSET = 0.5;
+    //private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     static {
         reloadBlacklistedBiomes();
     }
 
-    public static CompletableFuture<Location> findRandomSafeLocationAsync(World world, Location center, Set<Material> blacklistedBlocks) {
+    public static void reloadBlacklistedBiomes() {
+        List<String> entries = ConfigKeys.BLACKLISTED_BIOMES.getList();
+
+        BLACKLISTED_BIOMES.clear();
+        entries.stream()
+                .map(entry -> entry.split(":"))
+                .filter(parts -> parts.length == 2)
+                .forEach(parts -> BLACKLISTED_BIOMES
+                        .computeIfAbsent(parts[1], k -> ConcurrentHashMap.newKeySet())
+                        .add(parts[0].toUpperCase()));
+    }
+
+    public static CompletableFuture<Location> findRandomSafeLocationAsync(@NotNull World world, @NotNull Location center, Set<Material> blacklistedBlocks) {
         return findRandomSafeLocationAsync(world, center, blacklistedBlocks, 0);
     }
 
@@ -48,10 +64,8 @@ public final class TeleportUtils {
         return Collections.unmodifiableSet(materials);
     }
 
-    private static CompletableFuture<Location> findRandomSafeLocationAsync(World world, Location center, Set<Material> blacklistedBlocks, int attempt) {
-        if (attempt >= ConfigKeys.TELEPORT_MAXIMUM_ATTEMPTS.getInt()) {
-            return CompletableFuture.completedFuture(world.getSpawnLocation());
-        }
+    private static CompletableFuture<Location> findRandomSafeLocationAsync(@NotNull World world, @NotNull Location center, @Nullable Set<Material> blacklistedBlocks, int attempt) {
+        if (attempt >= ConfigKeys.TELEPORT_MAXIMUM_ATTEMPTS.getInt()) return CompletableFuture.completedFuture(world.getSpawnLocation());
 
         Random random = ThreadLocalRandom.current();
         int radius = getWorldRadius(world);
@@ -82,7 +96,7 @@ public final class TeleportUtils {
         String worldName = world.getName();
         String biomeName = world.getBiome(x, y, z).name();
 
-        if (BLACKLISTED_BIOMES.getOrDefault(worldName, Collections.emptySet()).contains(biomeName)) return false;
+        if (BLACKLISTED_BIOMES.getOrDefault(worldName, Collections.emptySet()).contains(biomeName.toUpperCase())) return false;
         if (ConfigKeys.RESPECT_WORLDGUARD.getBoolean() && WorldGuard.isInWorldGuardRegion(location)) return false;
 
         for (int i = 0; i < PLAYER_HEIGHT; i++) {
@@ -100,17 +114,5 @@ public final class TeleportUtils {
     private static boolean isBlockUnsafe(@NotNull Block block, @NotNull Set<Material> blacklistedBlocks, boolean isGround) {
         Material material = block.getType();
         return blacklistedBlocks.contains(material) || (isGround != material.isSolid());
-    }
-
-    private static void reloadBlacklistedBiomes() {
-        List<String> entries = AxRTP.getInstance().getConfiguration().getHandler().getList("blacklisted-biomes");
-
-        BLACKLISTED_BIOMES.clear();
-        entries.stream()
-                .map(entry -> entry.split(":"))
-                .filter(parts -> parts.length == PLAYER_HEIGHT)
-                .forEach(parts -> BLACKLISTED_BIOMES
-                        .computeIfAbsent(parts[1], k -> ConcurrentHashMap.newKeySet())
-                        .add(parts[0].toUpperCase()));
     }
 }

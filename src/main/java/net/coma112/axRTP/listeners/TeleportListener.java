@@ -1,6 +1,6 @@
 package net.coma112.axrtp.listeners;
 
-import net.coma112.axrtp.handlers.TeleportHandler;
+import net.coma112.axrtp.handlers.utils.TeleportHandler;
 import net.coma112.axrtp.identifiers.keys.ConfigKeys;
 import org.bukkit.Bukkit;
 import org.bukkit.World;

@@ -4,17 +4,13 @@ import com.github.Anon8281.universalScheduler.UniversalScheduler;
 import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
 import lombok.Getter;
 import net.coma112.axrtp.config.Config;
-import net.coma112.axrtp.handlers.ConfigurationHandler;
-import net.coma112.axrtp.handlers.CooldownHandler;
-import net.coma112.axrtp.handlers.LockdownHandler;
-import net.coma112.axrtp.hooks.PlaceholderAPI;
-import net.coma112.axrtp.identifiers.LanguageTypes;
+import net.coma112.axrtp.handlers.config.ConfigurationHandler;
+import net.coma112.axrtp.handlers.utils.CooldownHandler;
+import net.coma112.axrtp.handlers.utils.LockdownHandler;
 import net.coma112.axrtp.identifiers.keys.ConfigKeys;
 import net.coma112.axrtp.language.Language;
 import net.coma112.axrtp.utils.RegisterUtils;
 import revxrsal.zapper.ZapperJavaPlugin;
-
-import java.util.Arrays;
 import java.util.HashMap;
 
 public final class AxRTP extends ZapperJavaPlugin {
@@ -51,9 +47,9 @@ public final class AxRTP extends ZapperJavaPlugin {
     private void initializeComponents() {
         config = new Config();
 
-        Arrays.stream(LanguageTypes.values()).forEach(type -> ConfigurationHandler.saveResourceIfNotExists("locales/messages_" + type.name().toLowerCase() + ".yml"));
+        ConfigurationHandler.saveResourceIfNotExists("messages.yml");
         ConfigurationHandler.saveResourceIfNotExists("config.yml");
 
-        language = new Language("messages_" + LanguageTypes.valueOf(ConfigKeys.LANGUAGE.getString().toUpperCase()).name().toLowerCase());
+        language = new Language();
     }
 }
