@@ -5,7 +5,6 @@ import io.papermc.lib.PaperLib;
 import net.coma112.axrtp.AxRTP;
 import net.coma112.axrtp.identifiers.keys.ConfigKeys;
 import net.coma112.axrtp.identifiers.keys.MessageKeys;
-import net.coma112.axrtp.processor.ParticleProcessor;
 import net.coma112.axrtp.utils.LocationUtils;
 import net.coma112.axrtp.utils.PlayerFeedbackUtils;
 import net.coma112.axrtp.utils.TeleportUtils;
@@ -62,13 +61,7 @@ public class TeleportHandler {
                                         ConfigKeys.TITLE_TEXT.getString(),
                                         ConfigKeys.TITLE_SUBTITLE.getString());
                                 PlayerFeedbackUtils.playSounds(player);
-                                //PlayerFeedbackUtils.showParticles(player);
-                                //ParticleProcessor.showParticles(player);
-
-                                AxRTP.getInstance().getScheduler().runTask(() -> {
-                                    ParticleProcessor.showParticles(player);
-                                });
-
+                                PlayerFeedbackUtils.showParticles(player);
                                 PlayerFeedbackUtils.applyEffects(player);
                                 PlayerFeedbackUtils.runCommands(player);
 

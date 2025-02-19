@@ -23,8 +23,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -32,7 +30,6 @@ public final class TeleportUtils {
     private static final ConcurrentMap<String, Set<String>> BLACKLISTED_BIOMES = new ConcurrentHashMap<>();
     private static final int PLAYER_HEIGHT = 2;
     private static final double CENTER_OFFSET = 0.5;
-    //private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     static {
         reloadBlacklistedBiomes();

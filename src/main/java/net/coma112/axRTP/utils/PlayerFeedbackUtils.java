@@ -117,7 +117,22 @@ public class PlayerFeedbackUtils {
             }
         }
     }
+    public void showParticles(@NotNull Player player) {
+        if (!ConfigKeys.PARTICLE_ENABLED.getBoolean()) return;
 
+        String particleName = ConfigKeys.PARTICLE_DISPLAY.getString();
+        Particle particle = getParticleSafe(particleName);
+        if (particle == null) return;
+
+        Location baseLocation = player.getLocation().add(0, 1, 0);
+
+        CompletableFuture.runAsync(() -> {
+            cachedOffsets.forEach(offset -> {
+                Location particleLoc = baseLocation.clone().add(offset.getX(), offset.getY(), offset.getZ());
+                player.getWorld().spawnParticle(particle, particleLoc, 1);
+            });
+        });
+    }
 
     public static boolean deductMoney(@NotNull Player player, @NotNull World world) {
         if (!ConfigKeys.PRICES_ENABLED.getBoolean()) {
@@ -144,5 +159,13 @@ public class PlayerFeedbackUtils {
             }
 
         return true;
+    }
+
+    private @Nullable Particle getParticleSafe(@NotNull String particleName) {
+        try {
+            return Particle.valueOf(particleName);
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
     }
 }

@@ -41,7 +41,7 @@ public enum ConfigKeys {
     SOUND_LIST("sound.list"),
 
     PARTICLE_ENABLED("particle.enabled"),
-    PARTICLE_PATTERN("particle.pattern"),
+    PARTICLE_DISPLAY("particle.display"),
 
     EFFECTS_ENABLED("effects.enabled"),
     EFFECTS_LIST("effects.list"),

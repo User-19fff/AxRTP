@@ -53,6 +53,11 @@ sound:
     # See more -> https://jd.papermc.io/paper/1.21.1/org/bukkit/Sound.html
     - "UI_BUTTON_CLICK" # List of sounds to play.
 
+particle:
+  # Particle effects to display when teleporting.
+  enabled: true # Whether to display particle effects.
+  display: "CRIT_MAGIC" # Type of particle effect to display.
+
 effects:
   # Effects (e.g. status effects) to apply when teleporting.
   enabled: true # Whether to apply effects.
@@ -84,24 +89,5 @@ prices:
 
 respect: # If a value is true like worldguard then the player won't be able to teleport into a protected region.
   worldguard: false
-
-particle:
-  enabled: true # Disable if you don't want particles to be shown to the player
-  pattern: "sphere"
-  patterns:
-    sphere:
-      formula-x: "RADIUS * Math.cos(T)"
-      formula-y: "RADIUS * Math.sin(T)"
-      formula-z: "0"
-      points: 50
-      radius: 1.5
-      particle: "CRIT_MAGIC"
-    spiral:
-      formula-x: "T * Math.cos(T)"
-      formula-y: "T / 10"
-      formula-z: "T * Math.sin(T)"
-      points: 100
-      radius: 3
-      particle: "FLAME"
 
 centers: []
