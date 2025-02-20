@@ -8,10 +8,13 @@ import net.coma112.axrtp.identifiers.keys.ConfigKeys;
 import net.coma112.axrtp.listeners.DelayListener;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import revxrsal.commands.bukkit.BukkitLamp;
+import revxrsal.commands.bukkit.BukkitCommandHandler;
 import revxrsal.commands.orphan.Orphans;
 
+import java.util.Locale;
+
 @UtilityClass
+@SuppressWarnings("deprecation")
 public class RegisterUtils {
     public void registerListeners() {
         LoggerUtils.info("### Registering listeners... ###");
@@ -24,16 +27,18 @@ public class RegisterUtils {
     public static void registerCommands() {
         LoggerUtils.info("### Registering commands... ###");
 
-        var lamp = BukkitLamp.builder(AxRTP.getInstance())
-                .exceptionHandler(new CommandExceptionHandler())
-                .suggestionProviders(providers -> {
-                    providers.addProvider(String.class, context -> Bukkit.getWorlds().stream()
-                            .map(World::getName)
-                            .toList());
-                })
-                .build();
+        BukkitCommandHandler handler = BukkitCommandHandler.create(AxRTP.getInstance());
 
-        lamp.register(Orphans.path(ConfigKeys.ALIASES.getList().toArray(String[]::new)).handler(new CommandTeleport()));
+        handler.getAutoCompleter().registerParameterSuggestions(World.class, (args, sender, command) -> Bukkit.getWorlds().stream()
+                    .map(World::getName)
+                    .toList());
+
+        handler.getTranslator().add(new CommandExceptionHandler());
+        handler.setLocale(new Locale("en", "US"));
+
+        handler.register(Orphans.path(ConfigKeys.ALIASES.getList().toArray(String[]::new)).handler(new CommandTeleport()));
+        handler.registerBrigadier();
+
         LoggerUtils.info("### Successfully registered exception handlers... ###");
     }
 

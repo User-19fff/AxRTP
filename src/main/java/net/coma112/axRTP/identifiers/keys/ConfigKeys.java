@@ -1,8 +1,8 @@
 package net.coma112.axrtp.identifiers.keys;
 
+import com.artillexstudios.axapi.config.Config;
 import lombok.Getter;
 import net.coma112.axrtp.AxRTP;
-import net.coma112.axrtp.config.Config;
 import net.coma112.axrtp.processor.MessageProcessor;
 import org.jetbrains.annotations.NotNull;
 
@@ -64,22 +64,22 @@ public enum ConfigKeys {
     }
 
     public @NotNull String getString() {
-        return MessageProcessor.process(config.getHandler().getString(path));
+        return MessageProcessor.process(config.getString(path));
     }
 
     public static @NotNull String getString(@NotNull String path) {
-        return config.getHandler().getString(path);
+        return config.getString(path);
     }
 
     public boolean getBoolean() {
-        return config.getHandler().getBoolean(path);
+        return config.getBoolean(path);
     }
 
     public int getInt() {
-        return config.getHandler().getInt(path);
+        return config.getInt(path);
     }
 
     public List<String> getList() {
-        return config.getHandler().getList(path);
+        return config.getList(path);
     }
 }

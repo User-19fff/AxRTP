@@ -126,12 +126,10 @@ public class PlayerFeedbackUtils {
 
         Location baseLocation = player.getLocation().add(0, 1, 0);
 
-        CompletableFuture.runAsync(() -> {
-            cachedOffsets.forEach(offset -> {
-                Location particleLoc = baseLocation.clone().add(offset.getX(), offset.getY(), offset.getZ());
-                player.getWorld().spawnParticle(particle, particleLoc, 1);
-            });
-        });
+        CompletableFuture.runAsync(() -> cachedOffsets.forEach(offset -> {
+            Location particleLoc = baseLocation.clone().add(offset.getX(), offset.getY(), offset.getZ());
+            player.getWorld().spawnParticle(particle, particleLoc, 1);
+        }));
     }
 
     public static boolean deductMoney(@NotNull Player player, @NotNull World world) {

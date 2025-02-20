@@ -38,13 +38,14 @@ public enum MessageKeys {
     }
 
     public @NotNull String getMessage() {
-        return MessageProcessor.process(AxRTP.getInstance().getLanguage().getHandler().getString(path))
-                .replace("%prefix%", MessageProcessor.process(AxRTP.getInstance().getLanguage().getHandler().getString("prefix")));
+        return MessageProcessor.process(AxRTP.getInstance().getLanguage().getString(path))
+                .replace("%prefix%", MessageProcessor.process(AxRTP.getInstance().getLanguage().getString("prefix")));
     }
 
     public List<String> getMessages() {
-        return AxRTP.getInstance().getLanguage().getHandler().getList(path)
+        return AxRTP.getInstance().getLanguage().getStringList(path)
                 .stream()
                 .toList();
+
     }
 }

@@ -2,26 +2,32 @@ package net.coma112.axrtp.handlers;
 
 import net.coma112.axrtp.identifiers.keys.MessageKeys;
 import org.jetbrains.annotations.NotNull;
-import revxrsal.commands.bukkit.actor.BukkitCommandActor;
-import revxrsal.commands.bukkit.exception.BukkitExceptionHandler;
-import revxrsal.commands.bukkit.exception.SenderNotPlayerException;
-import revxrsal.commands.exception.MissingArgumentException;
-import revxrsal.commands.exception.NoPermissionException;
-import revxrsal.commands.node.ParameterNode;
+import revxrsal.commands.locales.LocaleReader;
 
-public class CommandExceptionHandler extends BukkitExceptionHandler {
+import java.util.Locale;
+
+@SuppressWarnings("deprecation")
+public class CommandExceptionHandler implements LocaleReader {
     @Override
-    public void onNoPermission(@NotNull NoPermissionException exception, @NotNull BukkitCommandActor actor) {
-        actor.error(MessageKeys.NO_PERMISSION.getMessage());
+    public boolean containsKey(@NotNull String string) {
+        return true;
     }
 
     @Override
-    public void onMissingArgument(@NotNull MissingArgumentException exception, @NotNull BukkitCommandActor actor, @NotNull ParameterNode<BukkitCommandActor, ?> parameter) {
-        actor.error(MessageKeys.MISSING_ARGUMENT.getMessage().replace("{usage}", parameter.command().usage()));
+    public String get(@NotNull String string) {
+        switch (string) {
+            case "missing-argument" -> MessageKeys.MISSING_ARGUMENT.getMessage();
+            case "no-permission" -> MessageKeys.NO_PERMISSION.getMessage();
+            case "must-be-player" -> MessageKeys.PLAYER_REQUIRED.getMessage();
+        }
+
+        return "";
     }
 
+    private final Locale LOCALE = new Locale("en", "US");
+
     @Override
-    public void onSenderNotPlayer(SenderNotPlayerException exception, @NotNull BukkitCommandActor actor) {
-        actor.error(MessageKeys.PLAYER_REQUIRED.getMessage());
+    public Locale getLocale() {
+        return LOCALE;
     }
 }

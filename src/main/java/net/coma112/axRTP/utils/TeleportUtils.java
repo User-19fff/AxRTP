@@ -105,7 +105,7 @@ public final class TeleportUtils {
     }
 
     private static int getWorldRadius(@NotNull World world) {
-        return AxRTP.getInstance().getConfiguration().getHandler().getInt("world-radius." + world.getName());
+        return AxRTP.getInstance().getConfiguration().getInt("world-radius." + world.getName());
     }
 
     private static boolean isBlockUnsafe(@NotNull Block block, @NotNull Set<Material> blacklistedBlocks, boolean isGround) {

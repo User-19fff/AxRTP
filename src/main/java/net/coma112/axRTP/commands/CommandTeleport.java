@@ -12,7 +12,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import revxrsal.commands.annotation.CommandPlaceholder;
+import revxrsal.commands.annotation.DefaultFor;
 import revxrsal.commands.annotation.Optional;
 import revxrsal.commands.annotation.Subcommand;
 import revxrsal.commands.annotation.Usage;
@@ -20,17 +20,12 @@ import revxrsal.commands.bukkit.annotation.CommandPermission;
 import revxrsal.commands.orphan.OrphanCommand;
 
 public class CommandTeleport implements OrphanCommand {
-    @CommandPlaceholder
-    public void defaultCommand(@NotNull Player player, @Optional @Nullable World world) {
-        rtp(player, world);
-    }
-
     @Subcommand("reload")
     @CommandPermission("axrtp.reload")
     @Usage("/alias reload")
     public void reload(@NotNull CommandSender sender) {
-        AxRTP.getInstance().getLanguage().getHandler().reload();
-        AxRTP.getInstance().getConfiguration().getHandler().reload();
+        AxRTP.getInstance().getLanguage().reload();
+        AxRTP.getInstance().getConfiguration().reload();
         TeleportUtils.reloadBlacklistedBiomes();
         PlayerFeedbackUtils.reloadPrices();
         sender.sendMessage(MessageKeys.RELOAD.getMessage());
@@ -38,8 +33,8 @@ public class CommandTeleport implements OrphanCommand {
 
     @Subcommand("rtp")
     @CommandPermission("axrtp.rtp")
-    @CommandPlaceholder
     @Usage("/alias rtp <world>")
+    @DefaultFor({"~"})
     public void rtp(@NotNull Player player, @Optional @Nullable World world) {
         if (world == null) world = player.getWorld();
 
@@ -80,8 +75,8 @@ public class CommandTeleport implements OrphanCommand {
     @Subcommand("set center")
     @CommandPermission("axrtp.set.center")
     public void setCenter(@NotNull Player player) {
-        AxRTP.getInstance().getConfiguration().getHandler().set("centers." + player.getWorld().getName(), LocationUtils.convertLocationToString(player.getLocation()));
-        AxRTP.getInstance().getConfiguration().getHandler().save();
+        AxRTP.getInstance().getConfiguration().set("centers." + player.getWorld().getName(), LocationUtils.convertLocationToString(player.getLocation()));
+        AxRTP.getInstance().getConfiguration().save();
         player.sendMessage(MessageKeys.SUCCESS_SET_CENTER.getMessage());
     }
 
