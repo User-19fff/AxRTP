@@ -35,7 +35,6 @@ public class RegisterUtils {
 
         handler.getTranslator().add(new CommandExceptionHandler());
         handler.setLocale(new Locale("en", "US"));
-
         handler.register(Orphans.path(ConfigKeys.ALIASES.getList().toArray(String[]::new)).handler(new CommandTeleport()));
         handler.registerBrigadier();
 

@@ -15,13 +15,29 @@ public class CommandExceptionHandler implements LocaleReader {
 
     @Override
     public String get(@NotNull String string) {
+        String result;
+
         switch (string) {
-            case "missing-argument" -> MessageKeys.MISSING_ARGUMENT.getMessage();
-            case "no-permission" -> MessageKeys.NO_PERMISSION.getMessage();
-            case "must-be-player" -> MessageKeys.PLAYER_REQUIRED.getMessage();
+            case "missing-argument": {
+                result = MessageKeys.MISSING_ARGUMENT.getMessage();
+                break;
+            }
+            case "no-permission": {
+                result = MessageKeys.NO_PERMISSION.getMessage();
+                break;
+            }
+            case "must-be-player": {
+                result = MessageKeys.PLAYER_REQUIRED.getMessage();
+                break;
+            }
+
+            default: {
+                result = "";
+                break;
+            }
         }
 
-        return "";
+        return result;
     }
 
     private final Locale LOCALE = new Locale("en", "US");
