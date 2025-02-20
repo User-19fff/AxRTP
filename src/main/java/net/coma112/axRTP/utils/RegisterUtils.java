@@ -18,7 +18,7 @@ public class RegisterUtils {
 
         Bukkit.getPluginManager().registerEvents(new DelayListener(), AxRTP.getInstance());
 
-        LoggerUtils.info("### Successfully registered 2 listener. ###");
+        LoggerUtils.info("### Successfully registered 1 listener. ###");
     }
 
     public static void registerCommands() {

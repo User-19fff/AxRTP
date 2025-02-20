@@ -135,9 +135,7 @@ public class PlayerFeedbackUtils {
     }
 
     public static boolean deductMoney(@NotNull Player player, @NotNull World world) {
-        if (!ConfigKeys.PRICES_ENABLED.getBoolean()) {
-            return true;
-        }
+        if (!ConfigKeys.PRICES_ENABLED.getBoolean()) return true;
 
         String worldName = world.getName();
         List<String> priceEntries = ConfigKeys.PRICES_LIST.getList();
